@@ -1,0 +1,156 @@
+---
+import Base from './Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { site, legalNav } from '@/data/site';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+
+interface Props {
+  title: string;
+  description: string;
+  intro: string;
+  toc: { id: string; label: string }[];
+}
+const { title, description, intro, toc } = Astro.props;
+const href = Astro.url.pathname;
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: title, href },
+];
+---
+
+<Base title={title} description={description} schema={[webPageSchema({ name: title, description, href }), breadcrumbSchema(crumbs)]}>
+  <section class="l-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <h1 class="l-hero__title">{title}</h1>
+      <p class="lead">{intro}</p>
+      <p class="l-hero__date">Última actualización: {site.legal.lastUpdated}</p>
+    </div>
+  </section>
+
+  <div class="container l-body">
+    <aside class="l-toc" aria-label="Índice">
+      <p class="l-toc__title">En esta página</p>
+      <ol role="list">
+        {
+          toc.map((t, i) => (
+            <li>
+              <a href={`#${t.id}`}>
+                <span>{String(i + 1).padStart(2, '0')}</span>
+                {t.label}
+              </a>
+            </li>
+          ))
+        }
+      </ol>
+      <p class="l-toc__title l-toc__title--other">Otros textos legales</p>
+      <ul role="list" class="l-toc__other">
+        {
+          legalNav
+            .filter((l) => l.href !== href)
+            .map((l) => (
+              <li>
+                <a href={l.href}>{l.label}</a>
+              </li>
+            ))
+        }
+      </ul>
+    </aside>
+    <article class="prose l-prose">
+      <slot />
+    </article>
+  </div>
+</Base>
+
+<style>
+  .l-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+    padding-bottom: clamp(40px, 5vw, 72px);
+    border-bottom: 1px solid var(--line);
+  }
+  .l-hero__title {
+    margin: 28px 0 20px;
+    max-width: 16ch;
+  }
+  .l-hero .lead {
+    max-width: 60ch;
+  }
+  .l-hero__date {
+    margin-top: 20px;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+  .l-body {
+    display: grid;
+    gap: 40px;
+    padding-top: clamp(40px, 5vw, 72px);
+    padding-bottom: var(--section);
+  }
+  .l-toc {
+    font-size: 0.95rem;
+  }
+  .l-toc__title {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+  .l-toc__title--other {
+    margin-top: 32px;
+  }
+  .l-toc ol {
+    display: grid;
+    gap: 2px;
+  }
+  .l-toc ol a {
+    display: flex;
+    gap: 12px;
+    padding: 7px 10px;
+    margin-left: -10px;
+    border-radius: var(--r-s);
+    line-height: 1.35;
+    transition: background-color 0.25s;
+  }
+  .l-toc ol a:hover {
+    background: var(--paper-2);
+  }
+  .l-toc ol a span {
+    font-family: var(--font-serif);
+    font-style: italic;
+    color: var(--green-ink);
+  }
+  .l-toc__other {
+    display: grid;
+    gap: 8px;
+  }
+  .l-toc__other a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: var(--line-strong);
+  }
+  .l-prose :global(h2:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  @media (max-width: 1023px) {
+    .l-toc {
+      padding: 20px;
+      border-radius: var(--r-m);
+      background: var(--paper-2);
+    }
+  }
+  @media (min-width: 1024px) {
+    .l-body {
+      grid-template-columns: 280px minmax(0, 1fr);
+      gap: 80px;
+    }
+    .l-toc {
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      align-self: start;
+    }
+  }
+</style>

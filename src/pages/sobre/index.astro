@@ -1,0 +1,417 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Button from '@/components/Button.astro';
+import Commitments from '@/components/Commitments.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import Mark from '@/assets/brand/mark.svg';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+import studio from '@/assets/images/estudio.jpg';
+
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Sobre nosotros', href: '/sobre/' },
+];
+const description =
+  'Somos Globalízame, el equipo digital que tu pyme no tiene en plantilla: estrategia, diseño, tecnología e inteligencia artificial con un único interlocutor y cero tecnicismos.';
+
+const beliefs = [
+  { title: 'La tecnología es un medio, no un fin.', text: 'No vendemos herramientas: resolvemos problemas de negocio. Si la solución es más sencilla de lo que esperabas, mejor.' },
+  { title: 'Claro antes que complejo.', text: 'Si no podemos explicarte algo en dos frases, todavía no lo hemos entendido lo suficiente.' },
+  { title: 'Tu negocio, tus reglas y tus datos.', text: 'Todo lo que construimos es tuyo. Nada de cajas negras ni de dependencias que no hayas elegido.' },
+  { title: 'Mejor a largo plazo.', text: 'Preferimos un cliente durante diez años que diez clientes durante uno. Eso cambia cómo trabajamos.' },
+];
+
+const compare = [
+  { row: 'Visión de conjunto', freelance: 'Centrada en su especialidad', agency: 'Repartida entre departamentos', us: 'Web, marketing, procesos y datos pensados juntos' },
+  { row: 'Interlocutor', freelance: 'Cercano, pero solo', agency: 'Cambia según la fase', us: 'Una persona de referencia de principio a fin' },
+  { row: 'Capacidades', freelance: 'Limitadas a una persona', agency: 'Amplias', us: 'Equipo multidisciplinar a la medida del proyecto' },
+  { row: 'Precio', freelance: 'Ajustado', agency: 'Pensado para grandes empresas', us: 'Proporcional al tamaño y al retorno para una pyme' },
+  { row: 'Continuidad', freelance: 'Depende de su disponibilidad', agency: 'Garantizada', us: 'Garantizada y con documentación de todo' },
+];
+---
+
+<Base
+  title="Sobre nosotros"
+  description={description}
+  schema={[webPageSchema({ type: 'AboutPage', name: 'Sobre Globalízame', description, href: '/sobre/' }), breadcrumbSchema(crumbs)]}
+>
+  <section class="a-hero">
+    <div class="container">
+      <div data-reveal><Breadcrumbs items={crumbs} /></div>
+      <p class="eyebrow a-hero__eyebrow" data-reveal style="--d:1">Sobre nosotros</p>
+      <h1 class="h-display" data-reveal style="--d:2">
+        El equipo digital que tu pyme <em>no tiene en plantilla.</em>
+      </h1>
+      <div class="a-hero__row">
+        <p class="lead" data-reveal style="--d:3">
+          Estrategia, diseño, tecnología e inteligencia artificial al servicio de un único objetivo: que tu negocio
+          venda más y dependa menos de ti.
+        </p>
+        <div data-reveal style="--d:4"><Button href="/contacto/" variant="green">Conócenos</Button></div>
+      </div>
+      <figure class="a-hero__media" data-reveal="img" style="--d:2">
+        <Image
+          src={studio}
+          alt="Vista cenital de una mesa de trabajo con libretas, notas adhesivas verdes, cafés y varias personas trabajando."
+          widths={[800, 1280, 1920]}
+          sizes="100vw"
+          loading="eager"
+        />
+      </figure>
+    </div>
+  </section>
+
+  <section class="section story" aria-labelledby="story-title">
+    <div class="container story__grid">
+      <h2 id="story-title" data-reveal>
+        Las pymes mueven este país. <em>Merecen herramientas a su altura.</em>
+      </h2>
+      <div class="story__text" data-reveal style="--d:1">
+        <p>
+          Las pequeñas y medianas empresas son la inmensa mayoría del tejido empresarial en España. Y, sin embargo, casi
+          todo lo digital se ha pensado para empresas grandes: herramientas complejas, proveedores que hablan en otro
+          idioma y presupuestos que no tienen en cuenta la realidad de un negocio que paga nóminas cada mes.
+        </p>
+        <p>
+          Globalízame nace para cambiar eso. Reunimos en un mismo equipo lo que una pyme necesitaría contratar por
+          separado —diseño, marketing, automatización, desarrollo de software e inteligencia artificial— y lo ponemos a
+          trabajar con un único propósito: que tu empresa funcione mejor y te necesite menos para el día a día.
+        </p>
+        <p>
+          No creemos en los proyectos eternos ni en las soluciones de catálogo. Creemos en entender bien tu negocio,
+          hacer primero lo que más retorno tiene y dejarte siempre el control.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-s name" aria-labelledby="name-title">
+    <div class="container">
+      <div class="name__box">
+        <div class="name__mark" data-reveal>
+          <Mark aria-hidden="true" />
+        </div>
+        <div class="name__copy">
+          <p class="eyebrow" data-reveal>El nombre</p>
+          <h2 id="name-title" data-reveal style="--d:1">Un mundo dentro de <em>una conversación.</em></h2>
+          <p data-reveal style="--d:2">
+            Nuestro símbolo es un globo terráqueo dentro de un bocadillo de diálogo. Resume lo que hacemos: abrir tu
+            negocio a más clientes, más lejos, sin perder lo que lo hace especial: el trato cercano y las conversaciones
+            de verdad.
+          </p>
+          <p data-reveal style="--d:3">
+            <strong>Globalízame</strong> es una petición en primera persona: «llévame más lejos». Y nuestra respuesta
+            siempre empieza igual: hablemos.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section beliefs" aria-labelledby="beliefs-title">
+    <div class="container">
+      <div class="beliefs__head">
+        <p class="eyebrow" data-reveal>En qué creemos</p>
+        <h2 id="beliefs-title" data-reveal style="--d:1">Cuatro ideas que <em>guían cada proyecto.</em></h2>
+      </div>
+      <ol role="list" class="beliefs__list">
+        {
+          beliefs.map((b, i) => (
+            <li class="belief" data-reveal style={`--d:${i % 2}`}>
+              <span class="belief__num">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{b.title}</h3>
+              <p>{b.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <section class="section compare on-ink" aria-labelledby="compare-title">
+    <div class="container">
+      <div class="compare__head">
+        <p class="eyebrow" data-reveal>Dónde encajamos</p>
+        <h2 id="compare-title" data-reveal style="--d:1">Ni freelance, ni gran agencia. <em>Lo mejor de ambos.</em></h2>
+      </div>
+      <div class="compare__table" data-reveal style="--d:2">
+        <table>
+          <caption class="sr-only">Comparativa entre un profesional freelance, una gran agencia y Globalízame</caption>
+          <thead>
+            <tr>
+              <td></td>
+              <th scope="col">Freelance</th>
+              <th scope="col">Gran agencia</th>
+              <th scope="col" class="is-us">Globalízame</th>
+            </tr>
+          </thead>
+          <tbody>
+            {
+              compare.map((c) => (
+                <tr>
+                  <th scope="row">{c.row}</th>
+                  <td data-label="Freelance">{c.freelance}</td>
+                  <td data-label="Gran agencia">{c.agency}</td>
+                  <td data-label="Globalízame" class="is-us">
+                    {c.us}
+                  </td>
+                </tr>
+              ))
+            }
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <Commitments title="Nuestra forma de trabajar, <em>por escrito.</em>" />
+  <CtaBand title="¿Te encaja nuestra forma de trabajar? <em>Hablemos.</em>" />
+</Base>
+
+<style>
+  .a-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+  }
+  .a-hero__eyebrow {
+    margin: 28px 0 24px;
+  }
+  .a-hero h1 {
+    max-width: 15ch;
+  }
+  .a-hero__row {
+    display: grid;
+    gap: 28px;
+    margin: 32px 0 clamp(40px, 5vw, 72px);
+  }
+  .a-hero__media {
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    aspect-ratio: 16 / 8;
+  }
+  .a-hero__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 700px) {
+    .a-hero__media {
+      aspect-ratio: 4 / 3;
+    }
+  }
+  @media (min-width: 900px) {
+    .a-hero__row {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+  }
+
+  .story__grid {
+    display: grid;
+    gap: 40px;
+  }
+  .story__grid h2 {
+    max-width: 14ch;
+  }
+  .story__text {
+    display: grid;
+    gap: 1.2em;
+    font-size: clamp(1.08rem, 1rem + 0.35vw, 1.28rem);
+    line-height: 1.6;
+    max-width: 58ch;
+  }
+  .story__text p:first-child::first-letter {
+    float: left;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 4.4em;
+    line-height: 0.8;
+    padding: 0.08em 0.1em 0 0;
+    color: var(--green-ink);
+  }
+  @media (min-width: 1024px) {
+    .story__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+    }
+    .story__grid h2 {
+      position: sticky;
+      top: calc(var(--header-h) + 40px);
+      align-self: start;
+    }
+  }
+
+  .name__box {
+    display: grid;
+    gap: 40px;
+    padding: clamp(28px, 5vw, 72px);
+    border-radius: var(--r-xl);
+    background: var(--paper-2);
+    align-items: center;
+  }
+  .name__mark {
+    width: min(320px, 70%);
+    justify-self: center;
+  }
+  .name__mark :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  .name__copy {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+  }
+  .name__copy p:not(.eyebrow) {
+    font-size: 1.1rem;
+    line-height: 1.65;
+    max-width: 54ch;
+    color: var(--text-muted);
+  }
+  .name__copy strong {
+    color: var(--ink);
+  }
+  @media (min-width: 900px) {
+    .name__box {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 72px;
+    }
+  }
+
+  .beliefs__head {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    margin-bottom: clamp(48px, 6vw, 80px);
+  }
+  .beliefs__head h2 {
+    max-width: 15ch;
+  }
+  .beliefs__list {
+    display: grid;
+    border-top: 1px solid var(--line-strong);
+  }
+  .belief {
+    display: grid;
+    gap: 12px;
+    padding: 36px 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .belief__num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.3rem;
+    color: var(--green-ink);
+  }
+  .belief h3 {
+    font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.6rem);
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+  }
+  .belief p {
+    color: var(--text-muted);
+    max-width: 46ch;
+    line-height: 1.6;
+  }
+  @media (min-width: 900px) {
+    .beliefs__list {
+      grid-template-columns: 1fr 1fr;
+      column-gap: 64px;
+    }
+  }
+
+  .compare {
+    border-radius: var(--r-xl);
+    margin-inline: clamp(0px, 1vw, 16px);
+  }
+  .compare__head {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  .compare__head h2 {
+    max-width: 18ch;
+  }
+  .compare__head h2 em {
+    color: var(--green);
+  }
+  .compare__table table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+  }
+  .compare__table th,
+  .compare__table td {
+    padding: 22px 20px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--line-on-ink);
+    line-height: 1.45;
+  }
+  .compare__table thead th {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-on-ink-muted);
+  }
+  .compare__table tbody th {
+    font-weight: 600;
+    font-size: 1.05rem;
+  }
+  .compare__table td {
+    color: var(--text-on-ink-muted);
+  }
+  .compare__table .is-us {
+    background: rgb(134 202 40 / 0.1);
+    color: var(--paper);
+    font-weight: 520;
+  }
+  .compare__table thead .is-us {
+    color: var(--green);
+    border-radius: var(--r-m) var(--r-m) 0 0;
+  }
+  .compare__table tbody tr:last-child .is-us {
+    border-radius: 0 0 var(--r-m) var(--r-m);
+  }
+  @media (max-width: 800px) {
+    .compare__table thead {
+      display: none;
+    }
+    .compare__table table,
+    .compare__table tbody,
+    .compare__table tr,
+    .compare__table th,
+    .compare__table td {
+      display: block;
+    }
+    .compare__table tr {
+      padding: 20px 0;
+      border-bottom: 1px solid var(--line-on-ink);
+    }
+    .compare__table th,
+    .compare__table td {
+      padding: 6px 0;
+      border: 0;
+    }
+    .compare__table tbody th {
+      font-size: 1.25rem;
+      margin-bottom: 6px;
+    }
+    .compare__table td::before {
+      content: attr(data-label) ' · ';
+      font-weight: 600;
+      color: var(--paper);
+    }
+    .compare__table .is-us {
+      margin-top: 8px;
+      padding: 12px 14px;
+      border-radius: var(--r-s);
+    }
+    .compare__table .is-us::before {
+      color: var(--green);
+    }
+  }
+</style>

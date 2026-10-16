@@ -1,0 +1,85 @@
+---
+/**
+ * Índice de sectores. Sólo se genera cuando hay sectores en src/data/sectors.ts.
+ */
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { sectors } from '@/data/sectors';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return sectors.length ? [{ params: { index: undefined } }] : [];
+}
+
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Sectores', href: '/sectores/' },
+];
+const description = 'Soluciones digitales adaptadas a la realidad de cada sector: web, marketing, automatización e inteligencia artificial para pymes.';
+---
+
+<Base title="Sectores" description={description} schema={[webPageSchema({ type: 'CollectionPage', name: 'Sectores', description, href: '/sectores/' }), breadcrumbSchema(crumbs)]}>
+  <section class="sx-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <h1 class="h-display">Conocemos tu sector. <em>Y sus atajos.</em></h1>
+      <p class="lead">{description}</p>
+    </div>
+  </section>
+  <section class="container sx-list">
+    <ul role="list">
+      {
+        sectors.map((s) => (
+          <li>
+            <a href={`/sectores/${s.slug}/`}>
+              <span class="sx-list__name">{s.name}</span>
+              <span class="sx-list__sum">{s.summary}</span>
+              <Icon name="arrow-up-right" />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  <CtaBand />
+</Base>
+
+<style>
+  .sx-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+    padding-bottom: clamp(40px, 5vw, 72px);
+  }
+  .sx-hero h1 {
+    margin: 28px 0 24px;
+    max-width: 14ch;
+  }
+  .sx-list {
+    padding-bottom: var(--section-s);
+  }
+  .sx-list ul {
+    border-top: 1px solid var(--line-strong);
+  }
+  .sx-list a {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .sx-list__name {
+    font-size: var(--fs-h3);
+    font-weight: 560;
+    letter-spacing: -0.03em;
+  }
+  .sx-list__sum {
+    grid-row: 2;
+    color: var(--text-muted);
+  }
+  .sx-list a :global(svg) {
+    grid-row: 1 / 3;
+    grid-column: 2;
+    align-self: center;
+  }
+</style>

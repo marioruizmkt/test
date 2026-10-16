@@ -1,0 +1,97 @@
+---
+/**
+ * Plantilla de sector. Genera /sectores/<slug>/ por cada sector de src/data/sectors.ts.
+ */
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Button from '@/components/Button.astro';
+import ServiceRows from '@/components/ServiceRows.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { sectors, type Sector } from '@/data/sectors';
+import { getService, type Service } from '@/data/services';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+
+export function getStaticPaths() {
+  return sectors.map((s) => ({ params: { slug: s.slug }, props: { sector: s } }));
+}
+
+interface Props {
+  sector: Sector;
+}
+const { sector } = Astro.props;
+const href = `/sectores/${sector.slug}/`;
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Sectores', href: '/sectores/' },
+  { label: sector.name, href },
+];
+const recommended = sector.services.map((s) => getService(s)).filter((s): s is Service => Boolean(s));
+---
+
+<Base title={sector.name} description={sector.description} schema={[webPageSchema({ name: sector.name, description: sector.description, href }), breadcrumbSchema(crumbs)]}>
+  <section class="sc-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <p class="eyebrow">{sector.name}</p>
+      <h1 class="h-display" set:html={sector.title} />
+      <p class="lead">{sector.lead}</p>
+      <Button href="/contacto/" variant="green">Cuéntanos tu caso</Button>
+    </div>
+  </section>
+  <section class="section-s">
+    <div class="container sc-grid">
+      <h2>Retos que <em>conocemos bien.</em></h2>
+      <ul role="list" class="sc-challenges">
+        {sector.challenges.map((c) => <li>{c}</li>)}
+      </ul>
+    </div>
+  </section>
+  {
+    recommended.length > 0 && (
+      <section class="section-s">
+        <div class="container">
+          <h2 class="sc-services-title">Cómo te ayudamos</h2>
+          <ServiceRows items={recommended} showChildren={false} />
+        </div>
+      </section>
+    )
+  }
+  <CtaBand />
+</Base>
+
+<style>
+  .sc-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+    padding-bottom: clamp(40px, 5vw, 72px);
+  }
+  .sc-hero .container {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+  }
+  .sc-hero h1 {
+    max-width: 14ch;
+  }
+  .sc-grid {
+    display: grid;
+    gap: 40px;
+  }
+  .sc-challenges {
+    border-top: 1px solid var(--line-strong);
+  }
+  .sc-challenges li {
+    padding: 22px 0;
+    border-bottom: 1px solid var(--line-strong);
+    font-size: clamp(1.15rem, 1rem + 0.6vw, 1.5rem);
+    letter-spacing: -0.02em;
+  }
+  .sc-services-title {
+    margin-bottom: 40px;
+  }
+  @media (min-width: 960px) {
+    .sc-grid {
+      grid-template-columns: 5fr 7fr;
+      gap: 64px;
+    }
+  }
+</style>

@@ -1,0 +1,97 @@
+---
+import Base from '@/layouts/Base.astro';
+import Button from '@/components/Button.astro';
+import Mark from '@/assets/brand/mark.svg';
+import { topLevelServices, serviceHref } from '@/data/services';
+---
+
+<Base title="Página no encontrada" noindex>
+  <section class="nf">
+    <div class="container nf__grid">
+      <div class="nf__mark" aria-hidden="true"><Mark /></div>
+      <div class="nf__copy">
+        <p class="eyebrow">Error 404</p>
+        <h1 class="h-display">Esta página se ha <em>ido de viaje.</em></h1>
+        <p class="lead">Puede que el enlace haya cambiado o que la dirección no sea correcta. Te dejamos algunos caminos para seguir.</p>
+        <div class="nf__actions">
+          <Button href="/" variant="green">Volver al inicio</Button>
+          <Button href="/contacto/" variant="ghost">Contactar</Button>
+        </div>
+        <ul role="list" class="nf__links">
+          {
+            topLevelServices.map((s) => (
+              <li>
+                <a href={serviceHref(s.slug)}>{s.name}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    padding-top: calc(var(--header-h) + clamp(40px, 6vw, 96px));
+    padding-bottom: var(--section);
+  }
+  .nf__grid {
+    display: grid;
+    gap: 48px;
+    align-items: center;
+  }
+  .nf__mark {
+    width: min(280px, 60%);
+    animation: drift 7s ease-in-out infinite;
+  }
+  .nf__mark :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  @keyframes drift {
+    50% {
+      transform: translateY(-14px) rotate(-4deg);
+    }
+  }
+  .nf__copy {
+    display: grid;
+    gap: 26px;
+    justify-items: start;
+  }
+  .nf__copy h1 {
+    max-width: 12ch;
+  }
+  .nf__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  .nf__links a {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--paper-2);
+    font-size: 0.92rem;
+    font-weight: 550;
+    transition: background-color 0.3s;
+  }
+  .nf__links a:hover {
+    background: var(--green);
+  }
+  @media (min-width: 900px) {
+    .nf__grid {
+      grid-template-columns: 0.6fr 1.4fr;
+      gap: 80px;
+    }
+    .nf__mark {
+      width: 100%;
+    }
+  }
+</style>

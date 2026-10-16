@@ -1,0 +1,110 @@
+---
+/**
+ * Índice del blog. Sólo se genera cuando existe al menos un artículo publicado
+ * en src/content/blog/ (los archivos que empiezan por "_" o con draft: true no cuentan).
+ */
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) => !data.draft);
+  return posts.length ? [{ params: { index: undefined } }] : [];
+}
+
+const posts = (await getCollection('blog', ({ data }) => !data.draft)).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const fmt = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Blog', href: '/blog/' },
+];
+const description = 'Ideas prácticas sobre web, marketing, automatización e inteligencia artificial para pymes.';
+---
+
+<Base title="Blog" description={description} schema={[webPageSchema({ type: 'Blog', name: 'Blog', description, href: '/blog/' }), breadcrumbSchema(crumbs)]}>
+  <section class="b-hero">
+    <div class="container">
+      <Breadcrumbs items={crumbs} />
+      <h1 class="h-display">Ideas para vender más y <em>depender menos.</em></h1>
+      <p class="lead">{description}</p>
+    </div>
+  </section>
+  <section class="container b-list">
+    <ul role="list">
+      {
+        posts.map((p) => (
+          <li>
+            <a href={`/blog/${p.id}/`} class="post">
+              {p.data.cover && (
+                <div class="post__media">
+                  <Image src={p.data.cover} alt={p.data.coverAlt ?? ''} widths={[400, 640, 800]} sizes="(min-width: 900px) 33vw, 100vw" />
+                </div>
+              )}
+              <p class="post__meta">
+                {p.data.category} · <time datetime={p.data.pubDate.toISOString()}>{fmt.format(p.data.pubDate)}</time>
+              </p>
+              <h2>{p.data.title}</h2>
+              <p class="post__desc">{p.data.description}</p>
+            </a>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+  <CtaBand />
+</Base>
+
+<style>
+  .b-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+    padding-bottom: clamp(40px, 5vw, 72px);
+  }
+  .b-hero h1 {
+    margin: 28px 0 24px;
+    max-width: 14ch;
+  }
+  .b-list ul {
+    display: grid;
+    gap: 48px 24px;
+    padding-bottom: var(--section-s);
+  }
+  @media (min-width: 900px) {
+    .b-list ul {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .post {
+    display: grid;
+    gap: 12px;
+  }
+  .post__media {
+    aspect-ratio: 4 / 3;
+    border-radius: var(--r-l);
+    overflow: hidden;
+    margin-bottom: 8px;
+  }
+  .post__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 1.2s var(--ease-out);
+  }
+  .post:hover .post__media :global(img) {
+    transform: scale(1.05);
+  }
+  .post__meta {
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+  .post h2 {
+    font-size: var(--fs-h3);
+  }
+  .post__desc {
+    color: var(--text-muted);
+  }
+</style>

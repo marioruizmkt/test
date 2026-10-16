@@ -1,0 +1,201 @@
+---
+/**
+ * Gestor de consentimiento. Sólo se incluye cuando hay herramientas que usan
+ * cookies no técnicas (ver `analytics` en src/data/site.ts). Ningún script de
+ * analítica se carga antes de que el usuario lo acepte.
+ */
+import { site } from '@/data/site';
+---
+
+<div class="consent" data-consent hidden role="dialog" aria-modal="false" aria-labelledby="consent-title">
+  <div class="consent__box">
+    <p id="consent-title" class="consent__title">Tu privacidad, primero</p>
+    <p class="consent__text">
+      Usamos cookies propias necesarias para que la web funcione y, sólo si lo aceptas, cookies de analítica para
+      entender cómo se usa y mejorarla. Más información en nuestra <a href="/politica-de-cookies/">política de cookies</a>.
+    </p>
+    <fieldset class="consent__prefs" data-consent-prefs hidden>
+      <legend class="sr-only">Categorías de cookies</legend>
+      <label class="consent__opt">
+        <input type="checkbox" checked disabled />
+        <span><strong>Técnicas</strong> · Siempre activas. Necesarias para el funcionamiento de la web.</span>
+      </label>
+      <label class="consent__opt">
+        <input type="checkbox" name="analytics" data-consent-analytics />
+        <span><strong>Analítica</strong> · Estadísticas anónimas de uso para mejorar la web.</span>
+      </label>
+    </fieldset>
+    <div class="consent__actions">
+      <button type="button" class="consent__btn" data-consent-action="reject">Rechazar</button>
+      <button type="button" class="consent__btn" data-consent-action="config">Configurar</button>
+      <button type="button" class="consent__btn consent__btn--save" data-consent-action="save" hidden>Guardar selección</button>
+      <button type="button" class="consent__btn consent__btn--primary" data-consent-action="accept">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<script is:inline define:vars={{ ga4Id: site.analytics.ga4Id }}>
+  (function () {
+    var KEY = 'gz-consent-v1';
+    var root = document.querySelector('[data-consent]');
+    if (!root) return;
+    var prefs = root.querySelector('[data-consent-prefs]');
+    var analyticsBox = root.querySelector('[data-consent-analytics]');
+    var saveBtn = root.querySelector('[data-consent-action="save"]');
+
+    function read() {
+      try { return JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { return null; }
+    }
+    function write(value) {
+      try { localStorage.setItem(KEY, JSON.stringify(value)); } catch (e) {}
+    }
+    function loadAnalytics() {
+      if (!ga4Id || window.__gzAnalytics) return;
+      window.__gzAnalytics = true;
+      var s = document.createElement('script');
+      s.async = true;
+      s.src = 'https://www.googletagmanager.com/gtag/js?id=' + ga4Id;
+      document.head.appendChild(s);
+      window.dataLayer = window.dataLayer || [];
+      window.gtag = function () { window.dataLayer.push(arguments); };
+      window.gtag('js', new Date());
+      window.gtag('config', ga4Id, { anonymize_ip: true });
+    }
+    function apply(choice) {
+      if (choice && choice.analytics) loadAnalytics();
+    }
+    function save(analytics) {
+      var choice = { analytics: !!analytics, date: new Date().toISOString() };
+      write(choice);
+      apply(choice);
+      root.hidden = true;
+    }
+    function open(showPrefs) {
+      var current = read();
+      analyticsBox.checked = !!(current && current.analytics);
+      prefs.hidden = !showPrefs;
+      saveBtn.hidden = !showPrefs;
+      root.hidden = false;
+    }
+
+    root.addEventListener('click', function (e) {
+      var btn = e.target.closest('[data-consent-action]');
+      if (!btn) return;
+      var action = btn.getAttribute('data-consent-action');
+      if (action === 'accept') save(true);
+      if (action === 'reject') save(false);
+      if (action === 'config') open(true);
+      if (action === 'save') save(analyticsBox.checked);
+    });
+    document.addEventListener('click', function (e) {
+      if (e.target.closest('[data-consent-open]')) open(true);
+    });
+
+    var stored = read();
+    if (stored) apply(stored);
+    else open(false);
+  })();
+</script>
+
+<style>
+  .consent {
+    position: fixed;
+    inset: auto 16px 16px;
+    z-index: 200;
+    display: flex;
+    justify-content: flex-start;
+    pointer-events: none;
+  }
+  .consent[hidden] {
+    display: none;
+  }
+  .consent__box {
+    pointer-events: auto;
+    width: min(460px, 100%);
+    padding: 24px;
+    border-radius: var(--r-m);
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 0 30px 80px -20px rgb(0 0 0 / 0.45);
+    animation: consent-in 0.7s var(--ease-out);
+  }
+  @keyframes consent-in {
+    from {
+      opacity: 0;
+      transform: translateY(20px);
+    }
+  }
+  .consent__title {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+  }
+  .consent__text {
+    font-size: 0.92rem;
+    line-height: 1.55;
+    color: var(--text-on-ink-muted);
+  }
+  .consent__text a {
+    color: var(--paper);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .consent__prefs {
+    display: grid;
+    gap: 10px;
+    margin-top: 16px;
+    padding: 0;
+    border: 0;
+  }
+  .consent__opt {
+    display: flex;
+    gap: 10px;
+    font-size: 0.88rem;
+    line-height: 1.45;
+    color: var(--text-on-ink-muted);
+  }
+  .consent__opt strong {
+    color: var(--paper);
+  }
+  .consent__opt input {
+    accent-color: var(--green);
+    width: 18px;
+    height: 18px;
+    flex: none;
+    margin-top: 1px;
+  }
+  .consent__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 18px;
+  }
+  .consent__btn {
+    flex: 1 1 auto;
+    min-height: 44px;
+    padding: 0 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line-on-ink);
+    font-weight: 600;
+    font-size: 0.92rem;
+    transition:
+      background-color 0.25s,
+      color 0.25s;
+  }
+  .consent__btn:hover {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  /* Aceptar y rechazar con la misma relevancia visual (criterio AEPD). */
+  .consent__btn--primary,
+  .consent__btn[data-consent-action='reject'] {
+    background: var(--green);
+    color: var(--ink);
+    border-color: var(--green);
+  }
+  .consent__btn--primary:hover,
+  .consent__btn[data-consent-action='reject']:hover {
+    background: var(--paper);
+    border-color: var(--paper);
+  }
+</style>

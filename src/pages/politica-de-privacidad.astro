@@ -1,0 +1,138 @@
+---
+import Legal from '@/layouts/Legal.astro';
+import L from '@/components/LegalValue.astro';
+import { site } from '@/data/site';
+
+const toc = [
+  { id: 'responsable', label: 'Responsable del tratamiento' },
+  { id: 'datos', label: 'Qué datos tratamos' },
+  { id: 'finalidades', label: 'Finalidades y base legal' },
+  { id: 'conservacion', label: 'Plazos de conservación' },
+  { id: 'destinatarios', label: 'Destinatarios' },
+  { id: 'transferencias', label: 'Transferencias internacionales' },
+  { id: 'derechos', label: 'Tus derechos' },
+  { id: 'seguridad', label: 'Seguridad' },
+  { id: 'menores', label: 'Menores de edad' },
+  { id: 'cambios', label: 'Cambios en esta política' },
+];
+---
+
+<Legal
+  title="Política de privacidad"
+  description="Cómo trata Globalízame tus datos personales: responsable, finalidades, base legal, conservación, destinatarios y cómo ejercer tus derechos según el RGPD."
+  intro="Tu confianza es la base de nuestro trabajo. Aquí te explicamos, de forma clara, qué datos personales tratamos, para qué y cómo puedes ejercer tus derechos, conforme al Reglamento (UE) 2016/679 (RGPD) y la Ley Orgánica 3/2018 (LOPDGDD)."
+  toc={toc}
+>
+  <h2 id="responsable">1. Responsable del tratamiento</h2>
+  <ul>
+    <li><strong>Responsable:</strong> <L v={site.legal.owner} /> ({site.name})</li>
+    <li><strong>NIF / CIF:</strong> <L v={site.legal.taxId} /></li>
+    <li><strong>Domicilio:</strong> <L v={site.legal.address} /></li>
+    <li><strong>Email de contacto para privacidad:</strong> <a href={`mailto:${site.legal.email}`}>{site.legal.email}</a></li>
+    <li><strong>Teléfono:</strong> {site.legal.phone}</li>
+  </ul>
+
+  <h2 id="datos">2. Qué datos tratamos</h2>
+  <p>Sólo tratamos los datos que tú nos facilitas o que son necesarios para atenderte:</p>
+  <ul>
+    <li><strong>Formulario de contacto:</strong> nombre, email, teléfono (opcional), empresa (opcional), servicios de interés, presupuesto orientativo y el contenido de tu mensaje.</li>
+    <li><strong>Comunicaciones por email, teléfono o WhatsApp:</strong> los datos de contacto y la información que compartas en la conversación.</li>
+    <li><strong>Clientes y potenciales clientes:</strong> datos de contacto profesional, de facturación y la información necesaria para prestar el servicio.</li>
+    <li><strong>Navegación:</strong> datos técnicos mínimos (como la dirección IP) que los servidores registran para garantizar la seguridad y el funcionamiento de la web.</li>
+  </ul>
+  <p>No solicitamos categorías especiales de datos. Te pedimos que no las incluyas en tus mensajes.</p>
+
+  <h2 id="finalidades">3. Finalidades y base legal</h2>
+  <div class="table-scroll">
+    <table>
+      <thead>
+        <tr><th scope="col">Finalidad</th><th scope="col">Base legal</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Responder a tus consultas y solicitudes de información.</td>
+          <td>Tu consentimiento (art. 6.1.a RGPD) y la aplicación de medidas precontractuales a petición tuya (art. 6.1.b RGPD).</td>
+        </tr>
+        <tr>
+          <td>Preparar y enviarte propuestas y presupuestos.</td>
+          <td>Aplicación de medidas precontractuales (art. 6.1.b RGPD).</td>
+        </tr>
+        <tr>
+          <td>Prestar los servicios contratados, facturarlos y gestionar la relación con clientes.</td>
+          <td>Ejecución de un contrato (art. 6.1.b RGPD) y cumplimiento de obligaciones legales (art. 6.1.c RGPD).</td>
+        </tr>
+        <tr>
+          <td>Enviarte comunicaciones sobre nuestros servicios, sólo si lo has autorizado o eres cliente.</td>
+          <td>Consentimiento (art. 6.1.a RGPD) o interés legítimo respecto a clientes (art. 21.2 LSSI-CE). Puedes oponerte en cualquier momento.</td>
+        </tr>
+        <tr>
+          <td>Garantizar la seguridad de la web y prevenir abusos.</td>
+          <td>Interés legítimo (art. 6.1.f RGPD).</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <p>No tomamos decisiones automatizadas ni elaboramos perfiles con efectos jurídicos sobre ti.</p>
+
+  <h2 id="conservacion">4. Plazos de conservación</h2>
+  <ul>
+    <li><strong>Consultas que no se convierten en relación comercial:</strong> el tiempo necesario para atenderlas y, como máximo, un año.</li>
+    <li><strong>Clientes:</strong> mientras dure la relación y, después, durante los plazos exigidos por la normativa fiscal y mercantil (con carácter general, seis años) y para atender posibles responsabilidades.</li>
+    <li><strong>Comunicaciones comerciales:</strong> hasta que retires tu consentimiento o te opongas.</li>
+  </ul>
+
+  <h2 id="destinatarios">5. Destinatarios</h2>
+  <p>
+    No vendemos ni cedemos tus datos a terceros, salvo obligación legal (por ejemplo, a la Administración Tributaria).
+    Para prestar nuestros servicios trabajamos con proveedores que pueden acceder a datos en calidad de encargados del
+    tratamiento, con los que hemos firmado los correspondientes contratos: alojamiento web, correo electrónico,
+    herramientas de gestión de formularios y de clientes, y asesoría contable.
+  </p>
+
+  <h2 id="transferencias">6. Transferencias internacionales</h2>
+  <p>
+    Algunos de nuestros proveedores tecnológicos pueden estar ubicados fuera del Espacio Económico Europeo. En ese caso,
+    sólo trabajamos con proveedores que ofrecen garantías adecuadas, como estar adheridos al Marco de Privacidad de
+    Datos UE-EE. UU. o haber suscrito las cláusulas contractuales tipo aprobadas por la Comisión Europea.
+  </p>
+
+  <h2 id="derechos">7. Tus derechos</h2>
+  <p>Puedes ejercer en cualquier momento los siguientes derechos:</p>
+  <ul>
+    <li><strong>Acceso:</strong> saber qué datos tuyos tratamos.</li>
+    <li><strong>Rectificación:</strong> corregir datos inexactos o incompletos.</li>
+    <li><strong>Supresión:</strong> pedir que eliminemos tus datos cuando ya no sean necesarios.</li>
+    <li><strong>Oposición:</strong> oponerte a determinados tratamientos, como las comunicaciones comerciales.</li>
+    <li><strong>Limitación:</strong> pedir que conservemos tus datos sólo para determinados fines.</li>
+    <li><strong>Portabilidad:</strong> recibir tus datos en un formato estructurado y de uso común.</li>
+    <li><strong>Retirar el consentimiento</strong> en cualquier momento, sin que ello afecte a la licitud del tratamiento previo.</li>
+  </ul>
+  <p>
+    Para ejercerlos, escríbenos a <a href={`mailto:${site.legal.email}`}>{site.legal.email}</a> indicando el derecho
+    que quieres ejercer. Si es necesario para verificar tu identidad, te pediremos información adicional. Responderemos
+    en el plazo máximo de un mes.
+  </p>
+  <p>
+    Si consideras que no hemos tratado tus datos correctamente, puedes presentar una reclamación ante la
+    <a href="https://www.aepd.es" target="_blank" rel="noopener">Agencia Española de Protección de Datos</a>.
+  </p>
+
+  <h2 id="seguridad">8. Seguridad</h2>
+  <p>
+    Aplicamos medidas técnicas y organizativas adecuadas para proteger tus datos frente a accesos no autorizados,
+    pérdida o alteración: conexión cifrada (HTTPS), control de accesos, copias de seguridad y proveedores que cumplen la
+    normativa europea.
+  </p>
+
+  <h2 id="menores">9. Menores de edad</h2>
+  <p>
+    Nuestros servicios se dirigen a empresas y profesionales. No tratamos de forma consciente datos de menores de 14
+    años. Si detectamos que los hemos recibido, los eliminaremos.
+  </p>
+
+  <h2 id="cambios">10. Cambios en esta política</h2>
+  <p>
+    Podemos actualizar esta política para adaptarla a cambios legales o en nuestros servicios. Publicaremos siempre la
+    versión vigente en esta página, con su fecha de actualización.
+  </p>
+</Legal>

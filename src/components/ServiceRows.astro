@@ -1,0 +1,244 @@
+---
+/**
+ * Lista editorial de servicios. En escritorio, una imagen sigue al cursor
+ * al pasar por cada fila.
+ */
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import { serviceHref, serviceNumber, childrenOf, type Service } from '@/data/services';
+
+interface Props {
+  items: Service[];
+  showChildren?: boolean;
+}
+const { items, showChildren = true } = Astro.props;
+---
+
+<div class="rows" data-rows>
+  <ul role="list" class="rows__list">
+    {
+      items.map((s, i) => (
+        <li class="rows__item" data-reveal style={`--d:${i % 4}`}>
+          <a href={serviceHref(s.slug)} class="rows__link" data-row={i}>
+            <span class="rows__num">{serviceNumber(s.slug)}</span>
+            <span class="rows__name">{s.name}</span>
+            <span class="rows__sum">{s.summary}</span>
+            <span class="rows__arrow" aria-hidden="true">
+              <Icon name="arrow-up-right" size={22} />
+            </span>
+          </a>
+          {showChildren && childrenOf(s.slug).length > 0 && (
+            <ul role="list" class="rows__children">
+              {childrenOf(s.slug).map((c) => (
+                <li>
+                  <a href={serviceHref(c.slug)}>
+                    <Icon name="arrow-right" size={14} />
+                    {c.name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          )}
+        </li>
+      ))
+    }
+  </ul>
+  <div class="rows__preview" aria-hidden="true" data-preview>
+    {items.map((s) => <Image src={s.image} alt="" widths={[420, 640]} sizes="320px" loading="lazy" />)}
+  </div>
+</div>
+
+<style>
+  .rows {
+    position: relative;
+  }
+  .rows__list {
+    border-top: 1px solid var(--line-strong);
+  }
+  .rows__item {
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .rows__link {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas:
+      'num name arrow'
+      '. sum sum';
+    align-items: center;
+    gap: 6px 18px;
+    padding: 26px 0;
+  }
+  .rows__num {
+    grid-area: num;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.15rem;
+    color: var(--green-ink);
+    width: 2.2ch;
+  }
+  .rows__name {
+    grid-area: name;
+    font-size: clamp(1.7rem, 1.1rem + 2.6vw, 3.6rem);
+    font-weight: 540;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    transition:
+      transform 0.6s var(--ease-out),
+      color 0.3s;
+  }
+  .rows__sum {
+    grid-area: sum;
+    color: var(--text-muted);
+    max-width: 44ch;
+    line-height: 1.5;
+  }
+  .rows__arrow {
+    grid-area: arrow;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 1px solid var(--line-strong);
+    transition:
+      background-color 0.4s,
+      border-color 0.4s,
+      transform 0.6s var(--ease-out);
+  }
+  .rows__link:hover .rows__arrow,
+  .rows__link:focus-visible .rows__arrow {
+    background: var(--green);
+    border-color: var(--green);
+    transform: rotate(45deg);
+  }
+  .rows__children {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: -10px 0 24px calc(2.2ch + 18px);
+  }
+  .rows__children a {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--paper-2);
+    font-size: 0.92rem;
+    font-weight: 550;
+    transition: background-color 0.3s;
+  }
+  .rows__children a:hover {
+    background: var(--green);
+  }
+
+  .rows__preview {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 5;
+    width: 300px;
+    aspect-ratio: 4 / 5;
+    border-radius: var(--r-m);
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(0.6) rotate(-4deg);
+    transition:
+      opacity 0.35s,
+      transform 0.5s var(--ease-out);
+    box-shadow: 0 30px 60px -20px rgb(20 23 20 / 0.35);
+    display: none;
+  }
+  .rows__preview.is-on {
+    opacity: 1;
+    transform: translate3d(var(--x, 0), var(--y, 0), 0) scale(1) rotate(var(--r, 0deg));
+  }
+  .rows__preview :global(img) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transform: scale(1.08);
+    transition:
+      opacity 0.4s,
+      transform 0.8s var(--ease-out);
+  }
+  .rows__preview :global(img.is-active) {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @media (hover: hover) and (min-width: 960px) {
+    .rows__link {
+      grid-template-columns: 4ch minmax(0, 1.2fr) minmax(0, 1fr) auto;
+      grid-template-areas: 'num name sum arrow';
+      gap: 32px;
+      padding: 34px 0;
+    }
+    .rows__sum {
+      padding-left: 0;
+    }
+    .rows__link:hover .rows__name {
+      transform: translateX(14px);
+    }
+    .rows__children {
+      margin-left: calc(4ch + 32px);
+    }
+    .rows__preview {
+      display: block;
+    }
+    .rows__list:hover .rows__item:not(:hover) .rows__name {
+      color: rgb(20 23 20 / 0.38);
+    }
+  }
+  @media (hover: none), (max-width: 959px) {
+    .rows__link {
+      grid-template-areas:
+        'num name arrow'
+        '. sum sum';
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rows]').forEach((root) => {
+    const preview = root.querySelector<HTMLElement>('[data-preview]');
+    if (!preview || !window.matchMedia('(hover: hover) and (min-width: 960px)').matches) return;
+    const imgs = [...preview.querySelectorAll('img')];
+    let x = 0,
+      y = 0,
+      cx = 0,
+      cy = 0,
+      raf = 0;
+    const tick = () => {
+      cx += (x - cx) * 0.16;
+      cy += (y - cy) * 0.16;
+      const vx = Math.max(-8, Math.min(8, (x - cx) * 0.05));
+      preview.style.setProperty('--x', `${cx - 150}px`);
+      preview.style.setProperty('--y', `${cy - 190}px`);
+      preview.style.setProperty('--r', `${vx}deg`);
+      raf = Math.abs(x - cx) + Math.abs(y - cy) > 0.5 ? requestAnimationFrame(tick) : 0;
+    };
+    root.addEventListener('pointermove', (e) => {
+      x = e.clientX;
+      y = e.clientY;
+      if (!raf) raf = requestAnimationFrame(tick);
+    });
+    root.querySelectorAll<HTMLElement>('[data-row]').forEach((row) => {
+      row.addEventListener('pointerenter', (e) => {
+        if (!preview.classList.contains('is-on')) {
+          cx = x = e.clientX;
+          cy = y = e.clientY;
+        }
+        const i = Number(row.dataset.row);
+        imgs.forEach((img, j) => img.classList.toggle('is-active', i === j));
+        preview.classList.add('is-on');
+      });
+    });
+    root.querySelector('.rows__list')?.addEventListener('pointerleave', () => preview.classList.remove('is-on'));
+  });
+</script>

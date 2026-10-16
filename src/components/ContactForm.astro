@@ -1,0 +1,479 @@
+---
+import Icon from './Icon.astro';
+import { site } from '@/data/site';
+import { services } from '@/data/services';
+
+const budgets = ['Aún no lo sé', 'Menos de 3.000 €', '3.000 € – 10.000 €', '10.000 € – 25.000 €', 'Más de 25.000 €'];
+const legalOwner = site.legal.owner.startsWith('[') ? site.name : site.legal.owner;
+---
+
+<form
+  class="cform"
+  method="post"
+  action={site.forms.endpoint || `mailto:${site.contact.email}`}
+  data-contact-form
+  data-endpoint={site.forms.endpoint}
+  data-email={site.contact.email}
+  novalidate
+>
+  <div class="cform__grid">
+    <div class="field">
+      <label for="f-name">Nombre <span aria-hidden="true">*</span></label>
+      <input id="f-name" name="nombre" type="text" autocomplete="name" required maxlength="120" />
+      <p class="field__error" id="f-name-err">Dinos cómo te llamas.</p>
+    </div>
+    <div class="field">
+      <label for="f-company">Empresa</label>
+      <input id="f-company" name="empresa" type="text" autocomplete="organization" maxlength="160" />
+    </div>
+    <div class="field">
+      <label for="f-email">Email <span aria-hidden="true">*</span></label>
+      <input id="f-email" name="email" type="email" autocomplete="email" required maxlength="160" />
+      <p class="field__error" id="f-email-err">Necesitamos un email válido para responderte.</p>
+    </div>
+    <div class="field">
+      <label for="f-phone">Teléfono</label>
+      <input id="f-phone" name="telefono" type="tel" autocomplete="tel" maxlength="30" />
+    </div>
+  </div>
+
+  <fieldset class="field chips">
+    <legend>¿En qué podemos ayudarte?</legend>
+    <div class="chips__list">
+      {
+        services.map((s) => (
+          <label class="chip">
+            <input type="checkbox" name="interes" value={s.slug} data-label={s.name} />
+            <span>{s.name}</span>
+          </label>
+        ))
+      }
+      <label class="chip">
+        <input type="checkbox" name="interes" value="no-lo-se" data-label="Aún no lo sé" />
+        <span>Aún no lo sé</span>
+      </label>
+    </div>
+  </fieldset>
+
+  <div class="field">
+    <label for="f-budget">Presupuesto orientativo</label>
+    <div class="select">
+      <select id="f-budget" name="presupuesto">
+        {budgets.map((b) => <option value={b}>{b}</option>)}
+      </select>
+      <Icon name="chevron-down" size={18} />
+    </div>
+  </div>
+
+  <div class="field">
+    <label for="f-message">Cuéntanos tu caso <span aria-hidden="true">*</span></label>
+    <textarea
+      id="f-message"
+      name="mensaje"
+      rows="6"
+      required
+      minlength="10"
+      maxlength="4000"
+      placeholder="A qué se dedica tu negocio, qué te gustaría mejorar y cualquier detalle que nos ayude a entenderlo."
+    ></textarea>
+    <p class="field__error" id="f-message-err">Cuéntanos un poco más (mínimo 10 caracteres).</p>
+  </div>
+
+  <!-- Campo trampa contra spam: los humanos no lo ven. -->
+  <div class="hp" aria-hidden="true">
+    <label for="f-web">No rellenar</label>
+    <input id="f-web" name="_gotcha" type="text" tabindex="-1" autocomplete="off" />
+  </div>
+
+  <div class="privacy">
+    <label class="check">
+      <input type="checkbox" name="privacidad" value="aceptada" required id="f-privacy" />
+      <span>
+        He leído y acepto la <a href="/politica-de-privacidad/" target="_blank">política de privacidad</a>. <span aria-hidden="true">*</span>
+      </span>
+    </label>
+    <p class="field__error" id="f-privacy-err">Necesitamos tu consentimiento para poder responderte.</p>
+    <details class="privacy__info">
+      <summary>Información básica sobre protección de datos</summary>
+      <dl>
+        <div><dt>Responsable</dt><dd>{legalOwner}</dd></div>
+        <div><dt>Finalidad</dt><dd>Responder a tu consulta y, si lo solicitas, enviarte una propuesta.</dd></div>
+        <div><dt>Legitimación</dt><dd>Tu consentimiento y la aplicación de medidas precontractuales.</dd></div>
+        <div><dt>Destinatarios</dt><dd>No se ceden datos a terceros, salvo obligación legal o proveedores que nos prestan servicio con las debidas garantías.</dd></div>
+        <div><dt>Derechos</dt><dd>Acceso, rectificación, supresión, oposición, limitación y portabilidad, como se explica en la <a href="/politica-de-privacidad/">política de privacidad</a>.</dd></div>
+      </dl>
+    </details>
+  </div>
+
+  <div class="cform__submit">
+    <button type="submit" class="btn btn--green">
+      <span>Enviar mensaje</span>
+      <span class="btn__icon"><Icon name="arrow-right" /></span>
+    </button>
+    <p class="cform__note">
+      <Icon name="clock" size={16} />
+      {site.contact.responseTime}
+    </p>
+  </div>
+
+  <p class="cform__status" role="status" aria-live="polite" data-status></p>
+</form>
+
+<div class="cform-done" data-done hidden tabindex="-1">
+  <span class="cform-done__icon" aria-hidden="true"><Icon name="check" size={28} /></span>
+  <h2>¡Gracias! <em>Mensaje recibido.</em></h2>
+  <p>
+    Lo leeremos con calma y te responderemos en menos de 24 horas laborables. Si es urgente, llámanos al
+    <a href={site.contact.phoneHref}>{site.contact.phone}</a>.
+  </p>
+</div>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const done = document.querySelector<HTMLElement>('[data-done]');
+    const endpoint = form.dataset.endpoint || '';
+    const email = form.dataset.email || '';
+
+    // Preselección desde enlaces (?interes=slug1,slug2&test=5)
+    const params = new URLSearchParams(location.search);
+    const interests = (params.get('interes') || '').split(',').filter(Boolean);
+    interests.forEach((slug) => {
+      const box = form.querySelector<HTMLInputElement>(`input[name="interes"][value="${CSS.escape(slug)}"]`);
+      if (box) box.checked = true;
+    });
+    const test = params.get('test');
+    const message = form.querySelector<HTMLTextAreaElement>('#f-message');
+    if (test && message && !message.value) {
+      message.value = `He hecho el test de dependencia y he marcado ${test} de 8 frases. `;
+    }
+
+    const fields = ['f-name', 'f-email', 'f-message', 'f-privacy'].map((id) => form.querySelector<HTMLInputElement>(`#${id}`)!);
+
+    const validate = (el: HTMLInputElement) => {
+      const ok = el.checkValidity();
+      const err = form.querySelector<HTMLElement>(`#${el.id}-err`);
+      el.toggleAttribute('aria-invalid', !ok);
+      if (err) {
+        el.setAttribute('aria-describedby', err.id);
+        err.classList.toggle('is-visible', !ok);
+      }
+      return ok;
+    };
+    fields.forEach((el) => {
+      el.addEventListener('blur', () => el.value && validate(el));
+      el.addEventListener('change', () => el.hasAttribute('aria-invalid') && validate(el));
+      el.addEventListener('input', () => el.hasAttribute('aria-invalid') && validate(el));
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const invalid = fields.filter((el) => !validate(el));
+      if (invalid.length) {
+        invalid[0].focus();
+        status.textContent = 'Revisa los campos marcados, por favor.';
+        return;
+      }
+      const data = new FormData(form);
+      if (data.get('_gotcha')) return;
+
+      const labels = [...form.querySelectorAll<HTMLInputElement>('input[name="interes"]:checked')].map((i) => i.dataset.label);
+
+      if (!endpoint) {
+        // Alternativa sin servidor: abre el cliente de correo con el mensaje preparado.
+        const body = [
+          `Nombre: ${data.get('nombre')}`,
+          `Empresa: ${data.get('empresa') || '-'}`,
+          `Email: ${data.get('email')}`,
+          `Teléfono: ${data.get('telefono') || '-'}`,
+          `Intereses: ${labels.join(', ') || '-'}`,
+          `Presupuesto: ${data.get('presupuesto')}`,
+          '',
+          String(data.get('mensaje')),
+        ].join('\n');
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent('Nuevo contacto desde la web')}&body=${encodeURIComponent(body)}`;
+        status.textContent = 'Hemos abierto tu programa de correo con el mensaje preparado. Sólo tienes que enviarlo.';
+        return;
+      }
+
+      const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+      button.disabled = true;
+      status.textContent = 'Enviando…';
+      data.set('interes', labels.join(', '));
+      try {
+        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
+        if (!res.ok) throw new Error(String(res.status));
+        form.hidden = true;
+        if (done) {
+          done.hidden = false;
+          done.focus();
+        }
+      } catch {
+        status.textContent = `No hemos podido enviar el mensaje. Inténtalo de nuevo o escríbenos a ${email}.`;
+        button.disabled = false;
+      }
+    });
+  }
+</script>
+
+<style>
+  .cform {
+    display: grid;
+    gap: 28px;
+  }
+  .cform__grid {
+    display: grid;
+    gap: 28px 20px;
+  }
+  @media (min-width: 640px) {
+    .cform__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  .field {
+    display: grid;
+    gap: 10px;
+    min-width: 0;
+    border: 0;
+    padding: 0;
+    margin: 0;
+  }
+  .field label,
+  .field legend {
+    font-weight: 600;
+    font-size: 0.95rem;
+    padding: 0;
+  }
+  .field legend {
+    margin-bottom: 12px;
+  }
+  .field input,
+  .field textarea,
+  .field select {
+    width: 100%;
+    padding: 14px 0;
+    border: 0;
+    border-bottom: 1.5px solid var(--line-strong);
+    border-radius: 0;
+    background: transparent;
+    font-size: 1.12rem;
+    transition: border-color 0.3s;
+    appearance: none;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 150px;
+    line-height: 1.5;
+  }
+  .field textarea::placeholder {
+    color: rgb(20 23 20 / 0.42);
+    font-size: 1rem;
+  }
+  .field input:focus,
+  .field textarea:focus,
+  .field select:focus {
+    outline: none;
+    border-color: var(--ink);
+    box-shadow: 0 1.5px 0 var(--green);
+  }
+  .field [aria-invalid] {
+    border-color: #b3261e;
+  }
+  .field__error {
+    display: none;
+    font-size: 0.86rem;
+    color: #b3261e;
+    font-weight: 550;
+  }
+  .field__error.is-visible {
+    display: block;
+  }
+  .select {
+    position: relative;
+  }
+  .select :global(svg) {
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .chips__list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    position: relative;
+    cursor: pointer;
+  }
+  .chip input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--line-strong);
+    font-size: 0.95rem;
+    font-weight: 520;
+    transition:
+      background-color 0.25s,
+      border-color 0.25s,
+      color 0.25s;
+  }
+  .chip:hover span {
+    border-color: var(--ink);
+  }
+  .chip input:checked + span {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .chip input:checked + span::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .chip input:focus-visible + span {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+
+  .privacy {
+    display: grid;
+    gap: 12px;
+  }
+  .check {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-size: 0.97rem;
+    line-height: 1.45;
+    cursor: pointer;
+  }
+  .check input {
+    flex: none;
+    width: 22px;
+    height: 22px;
+    margin: 0;
+    accent-color: var(--ink);
+  }
+  .check a,
+  .privacy__info a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .privacy__info {
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    border-radius: var(--r-s);
+    background: var(--paper-2);
+    padding: 12px 16px;
+  }
+  .privacy__info summary {
+    cursor: pointer;
+    font-weight: 550;
+  }
+  .privacy__info dl {
+    display: grid;
+    gap: 8px;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+  .privacy__info dl div {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 12px;
+  }
+  .privacy__info dt {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .privacy__info dd {
+    margin: 0;
+  }
+
+  .cform__submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px 24px;
+  }
+  .cform__submit .btn {
+    min-height: 60px;
+    font-size: 1.05rem;
+  }
+  .cform__submit .btn:disabled {
+    opacity: 0.6;
+    cursor: progress;
+  }
+  .cform__note {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+  .cform__status:empty {
+    display: none;
+  }
+  .cform__status {
+    padding: 14px 16px;
+    border-radius: var(--r-s);
+    background: var(--paper-2);
+    font-weight: 550;
+  }
+
+  .cform-done {
+    display: grid;
+    gap: 20px;
+    justify-items: start;
+    padding: clamp(28px, 4vw, 56px);
+    border-radius: var(--r-l);
+    background: var(--paper-2);
+  }
+  .cform-done[hidden] {
+    display: none;
+  }
+  .cform-done:focus {
+    outline: none;
+  }
+  .cform-done__icon {
+    display: grid;
+    place-items: center;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .cform-done h2 {
+    font-size: var(--fs-h2);
+  }
+  .cform-done p {
+    font-size: 1.1rem;
+    max-width: 46ch;
+    color: var(--text-muted);
+  }
+  .cform-done a {
+    color: var(--ink);
+    font-weight: 600;
+  }
+</style>

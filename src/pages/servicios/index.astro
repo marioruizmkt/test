@@ -1,0 +1,270 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Button from '@/components/Button.astro';
+import ServiceRows from '@/components/ServiceRows.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { pillars, servicesByPillar, type PillarId } from '@/data/services';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+import panorama from '@/assets/images/servicios-panorama.jpg';
+
+const pillarIds = Object.keys(pillars) as PillarId[];
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Servicios', href: '/servicios/' },
+];
+const description =
+  'Diseño web, marketing digital, automatización, inteligencia artificial, software a medida y consultoría para pymes. Todo lo digital de tu empresa con un único equipo.';
+
+const reasons = [
+  { title: 'Una sola visión', text: 'La web, el marketing y los procesos se diseñan pensando unos en otros, no como piezas sueltas.' },
+  { title: 'Menos coordinación para ti', text: 'Un único equipo y una persona de referencia. Se acabó hacer de intermediario entre proveedores.' },
+  { title: 'Todo encaja', text: 'Lo que captamos con el marketing entra directo en tus herramientas y se gestiona solo.' },
+];
+---
+
+<Base
+  title="Servicios digitales para pymes"
+  description={description}
+  schema={[webPageSchema({ type: 'CollectionPage', name: 'Servicios', description, href: '/servicios/' }), breadcrumbSchema(crumbs)]}
+>
+  <section class="i-hero">
+    <div class="container">
+      <div data-reveal><Breadcrumbs items={crumbs} /></div>
+      <div class="i-hero__grid">
+        <h1 class="h-display" data-reveal style="--d:1">
+          Todo lo digital de tu pyme, <em>bajo un mismo techo.</em>
+        </h1>
+        <div class="i-hero__side" data-reveal style="--d:2">
+          <p class="lead">
+            Seis servicios que se combinan como piezas de un mismo sistema: atraer clientes, trabajar con menos esfuerzo y
+            decidir con criterio.
+          </p>
+          <Button href="/contacto/" variant="green">Cuéntanos tu caso</Button>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <figure class="i-hero__pano" data-reveal="img" style="--d:2">
+        <Image
+          src={panorama}
+          alt="Hilera de objetos sobre papel: tarjetas, un avión de papel verde, una ficha de dominó, un prisma, un bloque, una cinta métrica y una brújula."
+          widths={[800, 1280, 1920, 2400]}
+          sizes="100vw"
+          loading="eager"
+        />
+      </figure>
+    </div>
+  </section>
+
+  {
+    pillarIds.map((id) => (
+      <section class="section-s pillar-block" aria-labelledby={`pillar-${id}`}>
+        <div class="container pillar-block__grid">
+          <div class="pillar-block__head">
+            <p class="eyebrow" data-reveal>
+              {pillars[id].label}
+            </p>
+            <h2 id={`pillar-${id}`} data-reveal style="--d:2">
+              {pillars[id].title}
+            </h2>
+            <p class="muted" data-reveal style="--d:3">
+              {pillars[id].text}
+            </p>
+          </div>
+          <ServiceRows items={servicesByPillar(id)} />
+        </div>
+      </section>
+    ))
+  }
+
+  <section class="section why on-ink" aria-labelledby="why-title">
+    <div class="container">
+      <div class="why__head">
+        <p class="eyebrow" data-reveal>Por qué con un solo equipo</p>
+        <h2 id="why-title" data-reveal style="--d:1">Menos proveedores. <em>Más resultados.</em></h2>
+      </div>
+      <ol role="list" class="why__list">
+        {
+          reasons.map((r, i) => (
+            <li data-reveal style={`--d:${i}`}>
+              <span class="why__num">{String(i + 1).padStart(2, '0')}</span>
+              <h3>{r.title}</h3>
+              <p>{r.text}</p>
+            </li>
+          ))
+        }
+      </ol>
+      <div class="why__nudge" data-reveal>
+        <p>
+          <strong>¿No sabes por dónde empezar?</strong> Haz nuestro test de un minuto o empieza por un diagnóstico de
+          consultoría.
+        </p>
+        <div class="why__nudge-actions">
+          <Button href="/#test" variant="green">Hacer el test</Button>
+          <Button href="/servicios/consultoria/" variant="ghost">Ver consultoría</Button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand />
+</Base>
+
+<style>
+  .i-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+  }
+  .i-hero__grid {
+    display: grid;
+    gap: 32px;
+    margin-top: 28px;
+    margin-bottom: clamp(40px, 5vw, 72px);
+  }
+  .i-hero__grid h1 {
+    max-width: 13ch;
+  }
+  .i-hero__side {
+    display: grid;
+    gap: 28px;
+    justify-items: start;
+    align-content: end;
+  }
+  .i-hero__pano {
+    border-radius: var(--r-xl);
+    overflow: hidden;
+    aspect-ratio: 21 / 9;
+  }
+  .i-hero__pano :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (max-width: 700px) {
+    .i-hero__pano {
+      aspect-ratio: 4 / 3;
+    }
+  }
+  @media (min-width: 1024px) {
+    .i-hero__grid {
+      grid-template-columns: 1.4fr 0.6fr;
+      gap: 64px;
+    }
+  }
+
+  .pillar-block + .pillar-block {
+    padding-top: 0;
+  }
+  .pillar-block__grid {
+    display: grid;
+    gap: 40px;
+  }
+  .pillar-block__head {
+    display: grid;
+    gap: 18px;
+    justify-items: start;
+    align-content: start;
+  }
+  .pillar-block__head h2 {
+    font-size: clamp(2rem, 1.4rem + 2.2vw, 3.6rem);
+    max-width: 12ch;
+  }
+  .pillar-block__head .muted {
+    max-width: 40ch;
+    line-height: 1.6;
+  }
+  @media (min-width: 1100px) {
+    .pillar-block__grid {
+      grid-template-columns: 4fr 8fr;
+      gap: 72px;
+      padding-top: var(--section-s);
+      background: linear-gradient(var(--line-strong), var(--line-strong)) var(--gutter) 0 / calc(100% - 2 * var(--gutter)) 1px
+        no-repeat;
+    }
+    .pillar-block__head {
+      position: sticky;
+      top: calc(var(--header-h) + 32px);
+      align-self: start;
+    }
+    .pillar-block__grid :global(.rows__link) {
+      grid-template-columns: 4ch minmax(0, 1fr) minmax(0, 0.9fr) auto;
+    }
+    .pillar-block__grid :global(.rows__name) {
+      font-size: clamp(1.6rem, 1rem + 1.6vw, 2.6rem);
+    }
+  }
+
+  .why {
+    border-radius: var(--r-xl);
+    margin: var(--section-s) clamp(0px, 1vw, 16px) 0;
+  }
+  .why__head {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    margin-bottom: clamp(48px, 6vw, 80px);
+  }
+  .why__head h2 em {
+    color: var(--green);
+  }
+  .why__list {
+    display: grid;
+    gap: 40px;
+  }
+  .why__list li {
+    display: grid;
+    gap: 12px;
+    padding-top: 24px;
+    border-top: 1px solid var(--line-on-ink);
+  }
+  .why__num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 2.6rem;
+    line-height: 1;
+    color: var(--green);
+  }
+  .why__list h3 {
+    font-size: var(--fs-h3);
+  }
+  .why__list p {
+    color: var(--text-on-ink-muted);
+    line-height: 1.6;
+    max-width: 38ch;
+  }
+  .why__nudge {
+    display: grid;
+    gap: 24px;
+    margin-top: clamp(56px, 6vw, 96px);
+    padding: clamp(24px, 3vw, 40px);
+    border-radius: var(--r-l);
+    background: var(--ink-2);
+    border: 1px solid var(--line-on-ink);
+  }
+  .why__nudge p {
+    font-size: var(--fs-lead);
+    line-height: 1.4;
+    max-width: 50ch;
+    color: var(--text-on-ink-muted);
+  }
+  .why__nudge strong {
+    color: var(--paper);
+    font-weight: 600;
+  }
+  .why__nudge-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  @media (min-width: 900px) {
+    .why__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+    }
+    .why__nudge {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+  }
+</style>

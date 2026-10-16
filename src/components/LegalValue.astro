@@ -1,0 +1,10 @@
+---
+/** Muestra un dato legal y lo resalta si sigue pendiente de completar. */
+interface Props {
+  v: string;
+}
+const { v } = Astro.props;
+const pending = v.startsWith('[');
+---
+
+{pending ? <mark class="placeholder" title="Dato pendiente de completar en src/data/site.ts">{v}</mark> : v}

@@ -1,0 +1,244 @@
+---
+import { Image } from 'astro:assets';
+import Base from '@/layouts/Base.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import ContactForm from '@/components/ContactForm.astro';
+import { site } from '@/data/site';
+import { breadcrumbSchema, webPageSchema } from '@/lib/schema';
+import cafe from '@/assets/images/contacto.jpg';
+
+const crumbs = [
+  { label: 'Inicio', href: '/' },
+  { label: 'Contacto', href: '/contacto/' },
+];
+const description =
+  'Cuéntanos tu caso y te responderemos en menos de 24 horas laborables. Escríbenos a info@globalizame.com, llámanos al +34 614 032 312 o usa el formulario.';
+
+const steps = [
+  { title: 'Te respondemos', text: 'En menos de 24 horas laborables, con una propuesta de fecha para hablar.' },
+  { title: 'Hablamos 30 minutos', text: 'Por videollamada o teléfono. Entendemos tu situación y resolvemos dudas.' },
+  { title: 'Recibes una propuesta', text: 'Clara, con alcance, plazos y presupuesto cerrado. Tú decides sin presión.' },
+];
+---
+
+<Base
+  title="Contacto"
+  description={description}
+  schema={[webPageSchema({ type: 'ContactPage', name: 'Contacto', description, href: '/contacto/' }), breadcrumbSchema(crumbs)]}
+>
+  <section class="c-hero">
+    <div class="container">
+      <div data-reveal><Breadcrumbs items={crumbs} /></div>
+      <h1 class="h-display" data-reveal style="--d:1">Cuéntanos tu caso. <em>Empezamos por escucharte.</em></h1>
+    </div>
+  </section>
+
+  <section class="contact">
+    <div class="container contact__grid">
+      <div class="contact__form" data-reveal style="--d:2">
+        <ContactForm />
+      </div>
+
+      <aside class="contact__aside" aria-label="Otras formas de contacto">
+        <ul role="list" class="channels" data-reveal style="--d:2">
+          <li>
+            <a href={`mailto:${site.contact.email}`} class="channel">
+              <span class="channel__icon"><Icon name="mail" size={20} /></span>
+              <span>
+                <span class="channel__label">Email</span>
+                <span class="channel__value">{site.contact.email}</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href={site.contact.phoneHref} class="channel">
+              <span class="channel__icon"><Icon name="phone" size={20} /></span>
+              <span>
+                <span class="channel__label">Teléfono</span>
+                <span class="channel__value">{site.contact.phone}</span>
+              </span>
+            </a>
+          </li>
+          <li>
+            <a href={site.contact.whatsapp} class="channel" target="_blank" rel="noopener">
+              <span class="channel__icon"><Icon name="whatsapp" size={20} /></span>
+              <span>
+                <span class="channel__label">WhatsApp</span>
+                <span class="channel__value">Escríbenos directamente</span>
+              </span>
+            </a>
+          </li>
+        </ul>
+        <p class="hours" data-reveal style="--d:3">
+          <Icon name="clock" size={16} />
+          {site.contact.hours}
+        </p>
+
+        <div class="next" data-reveal style="--d:3">
+          <p class="next__title">Qué pasa después</p>
+          <ol role="list">
+            {
+              steps.map((s, i) => (
+                <li>
+                  <span class="next__num">{i + 1}</span>
+                  <span>
+                    <strong>{s.title}</strong>
+                    <span>{s.text}</span>
+                  </span>
+                </li>
+              ))
+            }
+          </ol>
+        </div>
+
+        <figure class="contact__media" data-reveal="img" style="--d:2">
+          <Image src={cafe} alt="Dos cafés y una libreta en una mesa de terraza al sol." widths={[400, 640, 900]} sizes="(min-width: 1024px) 30vw, 100vw" />
+        </figure>
+      </aside>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .c-hero {
+    padding-top: calc(var(--header-h) + clamp(24px, 4vw, 56px));
+    padding-bottom: clamp(40px, 5vw, 72px);
+  }
+  .c-hero h1 {
+    margin-top: 28px;
+    max-width: 14ch;
+  }
+  .contact {
+    padding-bottom: var(--section);
+  }
+  .contact__grid {
+    display: grid;
+    gap: 56px;
+  }
+  .contact__form {
+    padding: clamp(24px, 4vw, 56px);
+    border-radius: var(--r-xl);
+    background: var(--white);
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .contact__aside {
+    display: grid;
+    gap: 28px;
+    align-content: start;
+  }
+  .channels {
+    display: grid;
+    gap: 8px;
+  }
+  .channel {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 16px;
+    border-radius: var(--r-m);
+    border: 1px solid var(--line-strong);
+    transition:
+      background-color 0.3s,
+      border-color 0.3s;
+  }
+  .channel:hover {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .channel__icon {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--ink);
+  }
+  .channel__label {
+    display: block;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+  .channel__value {
+    display: block;
+    font-size: 1.12rem;
+    font-weight: 560;
+    letter-spacing: -0.01em;
+  }
+  .hours {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: var(--fs-small);
+  }
+  .next {
+    padding: 28px;
+    border-radius: var(--r-l);
+    background: var(--paper-2);
+  }
+  .next__title {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 18px;
+  }
+  .next ol {
+    display: grid;
+    gap: 18px;
+  }
+  .next li {
+    display: flex;
+    gap: 14px;
+    line-height: 1.45;
+  }
+  .next li strong {
+    display: block;
+    font-weight: 600;
+  }
+  .next li span span {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+  .next__num {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--green);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1rem;
+  }
+  .contact__media {
+    border-radius: var(--r-l);
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+  .contact__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  @media (min-width: 1024px) {
+    .contact__grid {
+      grid-template-columns: 1.55fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+    .contact__aside {
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+    }
+  }
+</style>

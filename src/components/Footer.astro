@@ -1,0 +1,282 @@
+---
+import { getCollection } from 'astro:content';
+import LogoDark from '@/assets/brand/logo-dark-bg.svg';
+import Icon from './Icon.astro';
+import { site, legalNav, consentRequired } from '@/data/site';
+import { services, serviceHref } from '@/data/services';
+import { sectors } from '@/data/sectors';
+
+const posts = await getCollection('blog', ({ data }) => !data.draft);
+const company = [
+  { label: 'Sobre nosotros', href: '/sobre/' },
+  { label: 'Servicios', href: '/servicios/' },
+  ...(sectors.length ? [{ label: 'Sectores', href: '/sectores/' }] : []),
+  ...(posts.length ? [{ label: 'Blog', href: '/blog/' }] : []),
+  { label: 'Contacto', href: '/contacto/' },
+];
+const year = new Date().getFullYear();
+---
+
+<footer class="footer on-ink">
+  <div class="container">
+    <div class="footer__cta">
+      <p class="eyebrow">Siguiente paso</p>
+      <a href="/contacto/" class="footer__big h-mega">
+        <span>¿Habla</span><em>mos?</em>
+        <span class="footer__big-arrow" aria-hidden="true"><Icon name="arrow-up-right" size={64} /></span>
+      </a>
+      <div class="footer__direct">
+        <a href={`mailto:${site.contact.email}`} class="footer__direct-link">
+          <Icon name="mail" size={20} />
+          {site.contact.email}
+        </a>
+        <a href={site.contact.phoneHref} class="footer__direct-link">
+          <Icon name="phone" size={20} />
+          {site.contact.phone}
+        </a>
+        <a href={site.contact.whatsapp} class="footer__direct-link" target="_blank" rel="noopener">
+          <Icon name="whatsapp" size={20} />
+          WhatsApp
+        </a>
+      </div>
+    </div>
+
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="/" aria-label={`${site.name}, ir al inicio`} class="footer__logo">
+          <LogoDark width={180} height={62} aria-hidden="true" />
+        </a>
+        <p>{site.tagline}</p>
+      </div>
+      <nav aria-label="Servicios" class="footer__col">
+        <p class="footer__title">Servicios</p>
+        <ul role="list">
+          {
+            services.map((s) => (
+              <li class:list={{ 'is-child': !!s.parent }}>
+                <a href={serviceHref(s.slug)} class="link-soft">
+                  {s.name}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <nav aria-label="Empresa" class="footer__col">
+        <p class="footer__title">Globalízame</p>
+        <ul role="list">
+          {
+            company.map((i) => (
+              <li>
+                <a href={i.href} class="link-soft">
+                  {i.label}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+      <div class="footer__col">
+        <p class="footer__title">Contacto</p>
+        <ul role="list">
+          <li><a href={`mailto:${site.contact.email}`} class="link-soft">{site.contact.email}</a></li>
+          <li><a href={site.contact.phoneHref} class="link-soft">{site.contact.phone}</a></li>
+          <li class="footer__note">{site.contact.hours}</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} {site.name}. Todos los derechos reservados.</p>
+      <ul role="list" class="footer__legal">
+        {
+          legalNav.map((i) => (
+            <li>
+              <a href={i.href} class="link-soft">
+                {i.label}
+              </a>
+            </li>
+          ))
+        }
+        {
+          consentRequired && (
+            <li>
+              <button type="button" class="link-soft" data-consent-open>
+                Preferencias de cookies
+              </button>
+            </li>
+          )
+        }
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: relative;
+    padding-top: clamp(80px, 10vw, 150px);
+    padding-bottom: 32px;
+    border-radius: var(--r-xl) var(--r-xl) 0 0;
+    overflow: hidden;
+  }
+  .footer__cta {
+    display: grid;
+    justify-items: start;
+    gap: 28px;
+    padding-bottom: clamp(64px, 8vw, 120px);
+    border-bottom: 1px solid var(--line-on-ink);
+  }
+  .footer__big {
+    display: inline-flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    width: fit-content;
+    color: var(--paper);
+    transition: color 0.5s var(--ease-out);
+  }
+  .footer__big em {
+    color: var(--green);
+    padding-right: 0.06em;
+  }
+  .footer__big-arrow {
+    display: grid;
+    place-items: center;
+    width: clamp(56px, 7vw, 112px);
+    height: clamp(56px, 7vw, 112px);
+    margin: 0.08em 0 0 0.25em;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--ink);
+    transition: transform 0.6s var(--ease-out);
+  }
+  .footer__big-arrow :global(svg) {
+    width: 48%;
+    height: 48%;
+  }
+  .footer__big:hover .footer__big-arrow {
+    transform: rotate(45deg) scale(1.05);
+  }
+  .footer__direct {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .footer__direct-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--line-on-ink);
+    font-weight: 520;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      border-color 0.3s;
+  }
+  .footer__direct-link:hover {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+
+  .footer__grid {
+    display: grid;
+    gap: 48px 32px;
+    padding-block: clamp(56px, 6vw, 88px);
+    grid-template-columns: 1fr;
+  }
+  .footer__logo {
+    display: block;
+    width: 180px;
+    margin-bottom: 20px;
+  }
+  .footer__logo :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+  .footer__brand p {
+    max-width: 30ch;
+    color: var(--text-on-ink-muted);
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+  .footer__title {
+    margin-bottom: 18px;
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--green);
+  }
+  .footer__col ul {
+    display: grid;
+    gap: 10px;
+  }
+  .footer__col li.is-child {
+    padding-left: 14px;
+    position: relative;
+  }
+  .footer__col li.is-child::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.25em;
+    width: 7px;
+    height: 7px;
+    border-left: 1px solid var(--text-on-ink-muted);
+    border-bottom: 1px solid var(--text-on-ink-muted);
+  }
+  .footer__note {
+    color: var(--text-on-ink-muted);
+    font-size: var(--fs-small);
+  }
+  .link-soft {
+    color: var(--text-on-ink);
+    opacity: 0.86;
+    transition:
+      opacity 0.25s,
+      color 0.25s;
+  }
+  .link-soft:hover {
+    opacity: 1;
+    color: var(--green);
+  }
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 16px 32px;
+    padding-top: 28px;
+    border-top: 1px solid var(--line-on-ink);
+    font-size: var(--fs-small);
+    color: var(--text-on-ink-muted);
+  }
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+  }
+  .footer__legal .link-soft {
+    color: var(--text-on-ink-muted);
+    font-size: inherit;
+  }
+
+  @media (min-width: 720px) {
+    .footer__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .footer__brand {
+      grid-column: 1 / -1;
+    }
+  }
+  @media (min-width: 1100px) {
+    .footer__grid {
+      grid-template-columns: 1.6fr 1fr 1fr 1fr;
+    }
+    .footer__brand {
+      grid-column: auto;
+    }
+  }
+</style>

@@ -1,0 +1,357 @@
+---
+/**
+ * Test interactivo «¿Cuánto depende tu negocio de ti?».
+ * Funciona en el navegador, no guarda ni envía datos. Recomienda servicios
+ * y prepara el formulario de contacto con los intereses seleccionados.
+ */
+import Icon from './Icon.astro';
+import { getService, serviceHref } from '@/data/services';
+
+const questions = [
+  { text: 'Si no contestas tú el teléfono o el WhatsApp, se pierden clientes.', service: 'inteligencia-artificial' },
+  { text: 'Los clientes nuevos llegan, sobre todo, por el boca a boca.', service: 'marketing' },
+  { text: 'Tu web no te trae contactos de forma habitual.', service: 'diseno-web' },
+  { text: 'Pasas datos a mano de un programa a otro o a una hoja de cálculo.', service: 'automatizacion' },
+  { text: 'Hay información clave del negocio que sólo está en tu cabeza.', service: 'software' },
+  { text: 'Los programas que usas no encajan con tu forma de trabajar.', service: 'software/a-medida' },
+  { text: 'Presupuestos, facturas o seguimientos se retrasan si tú no estás.', service: 'automatizacion' },
+  { text: 'No tienes claro qué digitalizar primero ni cuánto invertir.', service: 'consultoria' },
+];
+
+const serviceMap = Object.fromEntries(
+  [...new Set(questions.map((q) => q.service))].map((slug) => {
+    const s = getService(slug)!;
+    return [slug, { name: s.name, href: serviceHref(slug) }];
+  }),
+);
+---
+
+<section class="test on-ink section" aria-labelledby="test-title" data-test>
+  <div class="container test__grid">
+    <div class="test__side">
+      <p class="eyebrow" data-reveal>Test de 1 minuto</p>
+      <h2 id="test-title" data-reveal style="--d:1">¿Cuánto depende tu negocio <em>de ti</em>?</h2>
+      <p class="lead" data-reveal style="--d:2">
+        Marca las frases que describen tu día a día. Al momento verás tu nivel de dependencia y por dónde empezaríamos.
+      </p>
+
+      <div class="test__result" data-reveal style="--d:3" aria-live="polite">
+        <div class="test__meter">
+          <svg viewBox="0 0 200 110" class="test__gauge" aria-hidden="true">
+            <path d="M14 100a86 86 0 0 1 172 0" class="test__track"></path>
+            <path d="M14 100a86 86 0 0 1 172 0" class="test__fill" pathLength="100" data-gauge></path>
+          </svg>
+          <p class="test__score"><span data-score>0</span><small>/{questions.length}</small></p>
+        </div>
+        <p class="test__level" data-level>Empieza marcando una frase</p>
+        <p class="test__desc" data-desc>Cuantas más frases marques, más horas está consumiendo el negocio de tu tiempo.</p>
+        <div class="test__recs" data-recs hidden>
+          <p class="test__recs-title">Por aquí empezaríamos</p>
+          <ul role="list" data-recs-list></ul>
+        </div>
+        <a href="/contacto/" class="btn btn--green test__cta" data-cta>
+          <span>Quiero mi plan</span>
+          <span class="btn__icon"><Icon name="arrow-right" /></span>
+        </a>
+      </div>
+    </div>
+
+    <ol role="list" class="test__list">
+      {
+        questions.map((q, i) => (
+          <li data-reveal style={`--d:${i % 4}`}>
+            <button type="button" class="test__q" aria-pressed="false" data-q={i} data-service={q.service}>
+              <span class="test__q-num">{String(i + 1).padStart(2, '0')}</span>
+              <span class="test__q-text">{q.text}</span>
+              <span class="test__q-check" aria-hidden="true">
+                <Icon name="check" size={18} />
+              </span>
+            </button>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<script define:vars={{ serviceMap, total: questions.length }} is:inline>
+  (function () {
+    var root = document.querySelector('[data-test]');
+    if (!root) return;
+    var buttons = Array.prototype.slice.call(root.querySelectorAll('[data-q]'));
+    var scoreEl = root.querySelector('[data-score]');
+    var levelEl = root.querySelector('[data-level]');
+    var descEl = root.querySelector('[data-desc]');
+    var gauge = root.querySelector('[data-gauge]');
+    var recs = root.querySelector('[data-recs]');
+    var recsList = root.querySelector('[data-recs-list]');
+    var cta = root.querySelector('[data-cta]');
+
+    var levels = [
+      { max: 0, level: 'Empieza marcando una frase', desc: 'Cuantas más frases marques, más horas está consumiendo el negocio de tu tiempo.' },
+      { max: 2, level: 'Dependencia baja', desc: 'Tienes una buena base. Con unos pocos ajustes puedes ganar visibilidad y tiempo.' },
+      { max: 5, level: 'Dependencia media', desc: 'Hay horas cada semana que podrías recuperar y clientes que se están quedando por el camino.' },
+      { max: total, level: 'Dependencia alta', desc: 'Tu negocio depende demasiado de ti. Es el mejor momento para ordenar, automatizar y crecer.' },
+    ];
+
+    function update() {
+      var active = buttons.filter(function (b) { return b.getAttribute('aria-pressed') === 'true'; });
+      var n = active.length;
+      scoreEl.textContent = n;
+      gauge.style.strokeDashoffset = String(100 - (n / total) * 100);
+      var l = levels.find(function (x) { return n <= x.max; });
+      levelEl.textContent = l.level;
+      descEl.textContent = l.desc;
+      root.setAttribute('data-state', n === 0 ? 'none' : n <= 2 ? 'low' : n <= 5 ? 'mid' : 'high');
+
+      var slugs = [];
+      active.forEach(function (b) {
+        var s = b.getAttribute('data-service');
+        if (slugs.indexOf(s) === -1) slugs.push(s);
+      });
+      slugs = slugs.slice(0, 3);
+      recsList.innerHTML = '';
+      slugs.forEach(function (s) {
+        var li = document.createElement('li');
+        var a = document.createElement('a');
+        a.href = serviceMap[s].href;
+        a.textContent = serviceMap[s].name;
+        li.appendChild(a);
+        recsList.appendChild(li);
+      });
+      recs.hidden = slugs.length === 0;
+      cta.href = '/contacto/' + (slugs.length ? '?interes=' + encodeURIComponent(slugs.join(',')) + '&test=' + n : '');
+    }
+
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+        update();
+      });
+    });
+    update();
+  })();
+</script>
+
+<style>
+  .test {
+    border-radius: var(--r-xl);
+    margin-inline: clamp(0px, 1vw, 16px);
+  }
+  .test__grid {
+    display: grid;
+    gap: 48px;
+  }
+  .test__side {
+    display: grid;
+    align-content: start;
+    gap: 24px;
+    justify-items: start;
+  }
+  .test__side h2 {
+    max-width: 13ch;
+  }
+  .test__side h2 em {
+    color: var(--green);
+  }
+  .test__result {
+    width: 100%;
+    max-width: 460px;
+    margin-top: 12px;
+    padding: 28px;
+    border-radius: var(--r-l);
+    background: var(--ink-2);
+    border: 1px solid var(--line-on-ink);
+    display: grid;
+    gap: 12px;
+  }
+  .test__meter {
+    position: relative;
+    width: 220px;
+  }
+  .test__gauge {
+    width: 100%;
+    overflow: visible;
+  }
+  .test__track,
+  .test__fill {
+    fill: none;
+    stroke-width: 14;
+    stroke-linecap: round;
+  }
+  .test__track {
+    stroke: var(--ink-3);
+  }
+  .test__fill {
+    stroke: var(--green);
+    stroke-dasharray: 100;
+    stroke-dashoffset: 100;
+    transition: stroke-dashoffset 0.9s var(--ease-out);
+  }
+  .test__score {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -4px;
+    text-align: center;
+    font-size: 3.4rem;
+    font-weight: 560;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .test__score small {
+    font-size: 1.1rem;
+    color: var(--text-on-ink-muted);
+    letter-spacing: 0;
+    margin-left: 2px;
+  }
+  .test__level {
+    margin-top: 10px;
+    font-size: 1.5rem;
+    font-weight: 560;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+  }
+  [data-state='high'] .test__level {
+    color: var(--green);
+  }
+  .test__desc {
+    color: var(--text-on-ink-muted);
+    line-height: 1.55;
+  }
+  .test__recs {
+    margin-top: 6px;
+  }
+  .test__recs-title {
+    font-size: var(--fs-xs);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--text-on-ink-muted);
+    margin-bottom: 10px;
+  }
+  .test__recs ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .test__recs :global(a) {
+    display: inline-block;
+    padding: 8px 14px;
+    border-radius: 999px;
+    border: 1px solid var(--line-on-ink);
+    font-size: 0.92rem;
+    font-weight: 550;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+  .test__recs :global(a:hover) {
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .test__cta {
+    margin-top: 10px;
+    justify-self: start;
+  }
+
+  .test__list {
+    display: grid;
+    gap: 10px;
+  }
+  .test__q {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 18px;
+    width: 100%;
+    padding: 22px 22px 22px 24px;
+    text-align: left;
+    border-radius: var(--r-m);
+    border: 1px solid var(--line-on-ink);
+    background: transparent;
+    transition:
+      background-color 0.35s,
+      border-color 0.35s,
+      color 0.35s,
+      transform 0.5s var(--ease-out);
+  }
+  .test__q:hover {
+    border-color: rgb(242 239 233 / 0.4);
+  }
+  .test__q:active {
+    transform: scale(0.99);
+  }
+  .test__q[aria-pressed='true'] {
+    background: var(--paper);
+    color: var(--ink);
+    border-color: var(--paper);
+  }
+  .test__q-num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.1rem;
+    color: var(--green);
+  }
+  .test__q[aria-pressed='true'] .test__q-num {
+    color: var(--green-ink);
+  }
+  .test__q-text {
+    font-size: clamp(1.02rem, 0.95rem + 0.35vw, 1.22rem);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.35;
+  }
+  .test__q-check {
+    display: grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid var(--line-on-ink);
+    color: transparent;
+    transition:
+      background-color 0.3s,
+      color 0.3s,
+      transform 0.5s var(--ease-out);
+  }
+  .test__q[aria-pressed='true'] .test__q-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--ink);
+    transform: rotate(-8deg) scale(1.08);
+  }
+  @media (max-width: 1023px) {
+    .test__grid {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .test__side {
+      display: contents;
+    }
+    .test__side > .eyebrow {
+      align-self: flex-start;
+    }
+    .test__list {
+      order: 1;
+      margin-top: 16px;
+    }
+    .test__result {
+      order: 2;
+      max-width: none;
+    }
+  }
+  @media (min-width: 1024px) {
+    .test__grid {
+      grid-template-columns: 5fr 6fr;
+      gap: 80px;
+    }
+    .test__side {
+      position: sticky;
+      top: calc(var(--header-h) + 24px);
+      align-self: start;
+    }
+  }
+</style>

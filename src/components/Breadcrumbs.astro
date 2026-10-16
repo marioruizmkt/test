@@ -1,0 +1,52 @@
+---
+export type Crumb = { label: string; href: string };
+interface Props {
+  items: Crumb[];
+}
+const { items } = Astro.props;
+---
+
+<nav aria-label="Migas de pan" class="crumbs">
+  <ol role="list">
+    {
+      items.map((c, i) => (
+        <li>
+          {i < items.length - 1 ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px;
+    font-size: var(--fs-small);
+    color: var(--text-muted);
+  }
+  .crumbs li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .crumbs li + li::before {
+    content: '';
+    width: 14px;
+    height: 1px;
+    background: currentColor;
+    opacity: 0.5;
+  }
+  .crumbs a {
+    transition: color 0.2s;
+  }
+  .crumbs a:hover {
+    color: var(--ink);
+  }
+  .crumbs [aria-current] {
+    color: var(--ink);
+    font-weight: 550;
+  }
+</style>

@@ -1,0 +1,129 @@
+---
+import Legal from '@/layouts/Legal.astro';
+import { site, consentRequired } from '@/data/site';
+
+const toc = [
+  { id: 'que-son', label: '¿Qué son las cookies?' },
+  { id: 'cookies-web', label: 'Cookies que usa esta web' },
+  { id: 'gestion', label: 'Cómo gestionarlas' },
+  { id: 'actualizaciones', label: 'Actualizaciones' },
+];
+
+type Row = { name: string; owner: string; purpose: string; duration: string; type: string };
+const rows: Row[] = [
+  ...(consentRequired
+    ? [
+        { name: 'gz-consent-v1 (almacenamiento local)', owner: site.name, purpose: 'Recordar tus preferencias de cookies.', duration: 'Hasta que la borres', type: 'Técnica' },
+        { name: '_ga', owner: 'Google (Google Analytics)', purpose: 'Distinguir usuarios de forma anónima para obtener estadísticas de uso.', duration: '2 años', type: 'Analítica' },
+        { name: '_ga_<ID>', owner: 'Google (Google Analytics)', purpose: 'Mantener el estado de la sesión para las estadísticas.', duration: '2 años', type: 'Analítica' },
+      ]
+    : []),
+];
+---
+
+<Legal
+  title="Política de cookies"
+  description="Información sobre el uso de cookies y tecnologías similares en la web de Globalízame y cómo puedes gestionarlas."
+  intro="Te explicamos qué son las cookies, cuáles utiliza esta web y cómo puedes configurarlas, conforme al artículo 22.2 de la LSSI-CE y las directrices de la Agencia Española de Protección de Datos."
+  toc={toc}
+>
+  <h2 id="que-son">1. ¿Qué son las cookies?</h2>
+  <p>
+    Las cookies son pequeños archivos que una web guarda en tu navegador para recordar información sobre tu visita,
+    como tus preferencias o cómo navegas. Existen tecnologías similares, como el almacenamiento local del navegador, a
+    las que también se aplica esta política.
+  </p>
+  <p>Según su finalidad, pueden ser:</p>
+  <ul>
+    <li><strong>Técnicas o necesarias:</strong> imprescindibles para que la web funcione. No requieren consentimiento.</li>
+    <li><strong>De preferencias:</strong> recuerdan opciones como el idioma.</li>
+    <li><strong>Analíticas:</strong> permiten medir de forma agregada cómo se usa la web.</li>
+    <li><strong>Publicitarias:</strong> muestran anuncios adaptados a tus intereses.</li>
+  </ul>
+
+  <h2 id="cookies-web">2. Cookies que usa esta web</h2>
+  {
+    rows.length === 0 ? (
+      <>
+        <p>
+          <strong>Esta web no instala cookies analíticas, publicitarias ni de terceros.</strong> Hemos diseñado la web
+          para respetar tu privacidad: las tipografías y los demás recursos se sirven desde nuestro propio servidor, sin
+          conexiones a servicios externos de seguimiento.
+        </p>
+        <p>
+          Si en el futuro incorporamos herramientas que utilicen cookies no necesarias, actualizaremos esta política y
+          te pediremos tu consentimiento previo mediante un aviso antes de instalarlas.
+        </p>
+      </>
+    ) : (
+      <>
+        <p>
+          Utilizamos las siguientes cookies. Las no técnicas sólo se instalan si das tu consentimiento en el aviso de
+          cookies.
+        </p>
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th scope="col">Nombre</th>
+                <th scope="col">Titular</th>
+                <th scope="col">Finalidad</th>
+                <th scope="col">Duración</th>
+                <th scope="col">Tipo</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((r) => (
+                <tr>
+                  <td>{r.name}</td>
+                  <td>{r.owner}</td>
+                  <td>{r.purpose}</td>
+                  <td>{r.duration}</td>
+                  <td>{r.type}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p>
+          Puedes cambiar tu elección en cualquier momento desde{' '}
+          <button type="button" data-consent-open class="inline-btn">
+            preferencias de cookies
+          </button>
+          .
+        </p>
+      </>
+    )
+  }
+  <p>
+    Al pulsar enlaces externos (por ejemplo, el de WhatsApp) sales de nuestra web y se aplican las políticas de cookies
+    de esos servicios.
+  </p>
+
+  <h2 id="gestion">3. Cómo gestionarlas</h2>
+  <p>
+    Además de las opciones de esta web, puedes permitir, bloquear o eliminar las cookies desde la configuración de tu
+    navegador:
+  </p>
+  <ul>
+    <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Google Chrome</a></li>
+    <li><a href="https://support.mozilla.org/es/kb/Borrar%20cookies" target="_blank" rel="noopener">Mozilla Firefox</a></li>
+    <li><a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener">Safari</a></li>
+    <li><a href="https://support.microsoft.com/es-es/microsoft-edge" target="_blank" rel="noopener">Microsoft Edge</a></li>
+  </ul>
+  <p>Si bloqueas todas las cookies, es posible que algunas funciones de la web no estén disponibles.</p>
+
+  <h2 id="actualizaciones">4. Actualizaciones</h2>
+  <p>
+    Revisaremos esta política cuando cambien las herramientas que utilizamos o la normativa aplicable. Para cualquier
+    duda, escríbenos a <a href={`mailto:${site.legal.email}`}>{site.legal.email}</a>.
+  </p>
+</Legal>
+
+<style>
+  .inline-btn {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    font-weight: 550;
+  }
+</style>

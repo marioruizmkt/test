@@ -1,0 +1,56 @@
+---
+/** Iconos de trazo único, 24×24, que heredan el color del texto. */
+type Name =
+  | 'arrow-right'
+  | 'arrow-up-right'
+  | 'arrow-down'
+  | 'plus'
+  | 'check'
+  | 'mail'
+  | 'phone'
+  | 'whatsapp'
+  | 'clock'
+  | 'menu'
+  | 'close'
+  | 'chevron-down';
+
+interface Props {
+  name: Name;
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 24, class: className } = Astro.props;
+
+const paths: Record<Name, string> = {
+  'arrow-right': '<path d="M4 12h15M13 5.5 19.5 12 13 18.5"/>',
+  'arrow-up-right': '<path d="M7 17 17 7M8 7h9v9"/>',
+  'arrow-down': '<path d="M12 4v15M5.5 13 12 19.5 18.5 13"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  check: '<path d="m5 12.5 4.5 4.5L19 7.5"/>',
+  mail: '<rect x="3" y="5" width="18" height="14" rx="3"/><path d="m4 7 8 6 8-6"/>',
+  phone:
+    '<path d="M6.6 3.5h2.6l1.6 4.2-2 1.4a11.5 11.5 0 0 0 6.1 6.1l1.4-2 4.2 1.6v2.6a2.5 2.5 0 0 1-2.7 2.5C10.6 19.4 4.6 13.4 4.1 6.2a2.5 2.5 0 0 1 2.5-2.7Z"/>',
+  whatsapp:
+    '<path d="M4 20l1.2-4A8.5 8.5 0 1 1 8.4 19l-4.4 1Z"/><path d="M9.2 8.6c.2-.5.6-.5.9-.5h.5c.2 0 .4.1.5.4l.7 1.6c.1.3 0 .5-.1.7l-.5.6c-.1.1-.2.3 0 .5.3.6 1.4 2 3 2.6.2.1.4 0 .5-.1l.6-.7c.2-.2.4-.2.6-.1l1.6.8c.2.1.4.3.3.6-.1.9-.9 1.7-1.9 1.7-2.8 0-6.3-3.2-6.3-6.1 0-.7.3-1.2.6-1.6Z" fill="currentColor" stroke="none"/>',
+  clock: '<circle cx="12" cy="12" r="8.5"/><path d="M12 7.5V12l3 2"/>',
+  menu: '<path d="M4 8h16M4 16h16"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  'chevron-down': '<path d="m6 9.5 6 6 6-6"/>',
+};
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.7"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  aria-hidden="true"
+  focusable="false"
+  set:html={paths[name]}
+/>

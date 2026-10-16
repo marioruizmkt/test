@@ -1,0 +1,101 @@
+---
+/** Compromisos de trabajo. Revisa que reflejen siempre la política real. */
+interface Props {
+  title?: string;
+}
+const { title = 'Lo que puedes esperar <em>de nosotros.</em>' } = Astro.props;
+
+const items = [
+  { title: 'Un único interlocutor', text: 'Hablas siempre con la misma persona, que conoce tu negocio y responde por el proyecto.' },
+  { title: 'Presupuesto cerrado', text: 'Sabes qué vas a pagar y qué vas a recibir antes de empezar. Por escrito y sin letra pequeña.' },
+  { title: 'Todo es tuyo', text: 'Dominio, cuentas, código y datos a tu nombre. Si un día te vas, te lo llevas todo.' },
+  { title: 'Sin tecnicismos', text: 'Te explicamos cada decisión en tu idioma, para que entiendas en qué inviertes y por qué.' },
+  { title: 'Resultados medibles', text: 'Acordamos desde el principio con qué cifras vamos a medir si el proyecto ha funcionado.' },
+  { title: 'Sin permanencias', text: 'En los servicios continuos no hay contratos de permanencia. Te quedas porque funciona.' },
+];
+---
+
+<section class="section commit" aria-labelledby="commit-title">
+  <div class="container">
+    <div class="commit__head">
+      <p class="eyebrow" data-reveal>Nuestros compromisos</p>
+      <h2 id="commit-title" data-reveal style="--d:1" set:html={title} />
+    </div>
+    <ul role="list" class="commit__grid">
+      {
+        items.map((it, i) => (
+          <li class="commit__item" data-reveal style={`--d:${i % 3}`}>
+            <span class="commit__mark" aria-hidden="true">
+              <svg viewBox="0 0 40 40">
+                <path d="M6 4h28a4 4 0 0 1 4 4v18a4 4 0 0 1-4 4H20l-7 6v-6H6a4 4 0 0 1-4-4V8a4 4 0 0 1 4-4Z" />
+                <path d="m13 17.5 4.5 4.5 9.5-9.5" class="tick" />
+              </svg>
+            </span>
+            <h3>{it.title}</h3>
+            <p>{it.text}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .commit__head {
+    display: grid;
+    gap: 24px;
+    justify-items: start;
+    margin-bottom: clamp(48px, 6vw, 80px);
+  }
+  .commit__head h2 {
+    max-width: 15ch;
+  }
+  .commit__grid {
+    display: grid;
+    border-top: 1px solid var(--line-strong);
+  }
+  .commit__item {
+    display: grid;
+    align-content: start;
+    gap: 12px;
+    padding: 32px 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .commit__mark svg {
+    width: 40px;
+    height: 40px;
+    fill: var(--green);
+  }
+  .commit__mark .tick {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .commit__item h3 {
+    font-size: var(--fs-h4);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    margin-top: 8px;
+  }
+  .commit__item p {
+    color: var(--text-muted);
+    line-height: 1.6;
+    max-width: 38ch;
+  }
+  @media (min-width: 720px) {
+    .commit__grid {
+      grid-template-columns: repeat(2, 1fr);
+      column-gap: 48px;
+    }
+  }
+  @media (min-width: 1100px) {
+    .commit__grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+    .commit__item {
+      padding: 40px 0 44px;
+    }
+  }
+</style>
