@@ -1,0 +1,508 @@
+---
+/**
+ * Iconos animados de línea, en el mismo lenguaje que el globo del hero:
+ * trazos verdes finos, nodos y pulsos de luz que recorren las conexiones.
+ * SVG + CSS puro: nítidos a cualquier tamaño, sin peticiones y respetan "reducir movimiento".
+ */
+export type ServiceIconName =
+  | 'diseno-web'
+  | 'marketing'
+  | 'automatizacion'
+  | 'inteligencia-artificial'
+  | 'software'
+  | 'software-a-medida'
+  | 'consultoria'
+  | 'contacto'
+  | 'error'
+  | 'objetivo';
+
+interface Props {
+  name: ServiceIconName;
+  class?: string;
+  /** Texto alternativo; sin él, el icono es decorativo. */
+  label?: string;
+}
+const { name, class: className, label } = Astro.props;
+---
+
+<svg
+  class:list={['sicon', `sicon--${name}`, className]}
+  viewBox="0 0 120 120"
+  fill="none"
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  aria-hidden={label ? undefined : 'true'}
+>
+  {name === 'diseno-web' && (
+    <Fragment>
+      <rect class="w" x="10" y="18" width="100" height="80" rx="8" />
+      <path class="s" d="M10 33H110" />
+      <circle class="dot" cx="19" cy="25.5" r="2" />
+      <circle class="dot" cx="26" cy="25.5" r="2" />
+      <circle class="dot" cx="33" cy="25.5" r="2" />
+      <rect class="draw" style="--i:0" x="20" y="42" width="38" height="24" rx="3" pathLength="1" />
+      <path class="draw" style="--i:1" d="M66 46H100M66 54H94M66 62H86" pathLength="1" />
+      <rect class="draw" style="--i:2" x="20" y="74" width="80" height="14" rx="3" pathLength="1" />
+      <g class="cursor">
+        <circle class="ripple" cx="86" cy="80" r="4" />
+        <path class="s fill" d="M86 80l14 6-6 2-2 6z" />
+      </g>
+    </Fragment>
+  )}
+
+  {name === 'marketing' && (
+    <Fragment>
+      <path class="s" d="M14 30H106L72 66V94L48 104V66Z" />
+      <path class="w" d="M24 40H96M38 54H82" />
+      {[22, 40, 58, 76, 94].map((x, i) => (
+        <circle class="drop" style={`--i:${i}`} cx={x} cy="10" r="3" />
+      ))}
+      <circle class="out" cx="60" cy="104" r="4" />
+      <path class="p" d="M60 66V112" pathLength="1" />
+    </Fragment>
+  )}
+
+  {name === 'automatizacion' && (
+    <Fragment>
+      <path class="w" d="M22 26H60V60H98V94" />
+      <path class="p" d="M22 26H60V60H98V94" pathLength="1" />
+      <path class="p" style="--i:1" d="M22 26H60V60H98V94" pathLength="1" />
+      <rect class="node" x="12" y="16" width="20" height="20" rx="5" />
+      <path class="s fill" d="M19 21l8 5-8 5z" />
+      <rect class="node" x="50" y="16" width="20" height="20" rx="5" />
+      <circle class="s" cx="60" cy="26" r="4" />
+      <rect class="node" x="50" y="50" width="20" height="20" rx="5" />
+      <path class="s" d="M55 60h10M60 55v10" />
+      <rect class="node" x="88" y="50" width="20" height="20" rx="5" />
+      <path class="s" d="M93 57h10M93 63h6" />
+      <rect class="node node--on" x="88" y="84" width="20" height="20" rx="5" />
+      <path class="s ink" d="M93 94l3.5 3.5L103 90" />
+    </Fragment>
+  )}
+
+  {name === 'inteligencia-artificial' && (
+    <Fragment>
+      <g class="w">
+        {[34, 60, 86].map((a) => [22, 46, 74, 98].map((b) => <path d={`M22 ${a}L60 ${b}`} />))}
+        {[22, 46, 74, 98].map((a) => [46, 74].map((b) => <path d={`M60 ${a}L98 ${b}`} />))}
+      </g>
+      <path class="p" d="M22 34L60 46L98 74" pathLength="1" />
+      <path class="p" style="--i:1" d="M22 86L60 74L98 46" pathLength="1" />
+      <path class="p" style="--i:2" d="M22 60L60 98L98 74" pathLength="1" />
+      {[34, 60, 86].map((y, i) => <circle class="neuron" style={`--i:${i}`} cx="22" cy={y} r="5" />)}
+      {[22, 46, 74, 98].map((y, i) => <circle class="neuron" style={`--i:${i + 3}`} cx="60" cy={y} r="5" />)}
+      {[46, 74].map((y, i) => <circle class="neuron neuron--out" style={`--i:${i + 7}`} cx="98" cy={y} r="6" />)}
+    </Fragment>
+  )}
+
+  {name === 'software' && (
+    <Fragment>
+      <rect class="w" x="16" y="16" width="40" height="40" rx="8" />
+      <path class="s" d="M30 30l-6 6 6 6M42 30l6 6-6 6" />
+      <rect class="w" x="64" y="16" width="40" height="40" rx="8" />
+      <path class="w" d="M72 28H96M72 36H90M72 44H94" />
+      <rect class="w" x="16" y="64" width="40" height="40" rx="8" />
+      <circle class="w" cx="36" cy="84" r="10" />
+      <path class="s" d="M36 74a10 10 0 0 1 10 10" />
+      <rect class="w dashed" x="64" y="64" width="40" height="40" rx="8" />
+      <g class="slot">
+        <rect class="s tile" x="64" y="64" width="40" height="40" rx="8" />
+        <path class="s ink" d="M76 84h16M84 76v16" />
+      </g>
+    </Fragment>
+  )}
+
+  {name === 'software-a-medida' && (
+    <Fragment>
+      <path class="s" d="M14 28H58V45a8 8 0 1 1 0 16V92H14Z" />
+      <path class="w" d="M24 40H44M24 50H40M24 80H48" />
+      <g class="piece">
+        <path class="s tile" d="M60 28H106V92H60V61a8 8 0 1 0 0-16Z" />
+        <path class="s ink" d="M78 60l6 6 12-12" />
+      </g>
+      <path class="p" d="M14 100H106" pathLength="1" />
+    </Fragment>
+  )}
+
+  {name === 'consultoria' && (
+    <Fragment>
+      <circle class="w" cx="60" cy="60" r="46" />
+      <circle class="w" cx="60" cy="60" r="31" />
+      <circle class="w" cx="60" cy="60" r="16" />
+      <path class="w" d="M60 10V110M10 60H110" />
+      <g class="sweep">
+        <path class="sweep__cone" d="M60 60L60 14A46 46 0 0 1 99.8 37Z" />
+        <path class="s" d="M60 60V14" />
+      </g>
+      <circle class="blip" style="--i:0" cx="84" cy="36" r="4" />
+      <circle class="blip" style="--i:1" cx="40" cy="82" r="3" />
+      <circle class="blip" style="--i:2" cx="88" cy="78" r="3" />
+      <circle class="s fill" cx="60" cy="60" r="3.5" />
+    </Fragment>
+  )}
+
+  {name === 'contacto' && (
+    <Fragment>
+      <path class="s" d="M24 20H96a12 12 0 0 1 12 12V72a12 12 0 0 1-12 12H58L38 100V84H24a12 12 0 0 1-12-12V32a12 12 0 0 1 12-12Z" />
+      <circle class="type" style="--i:0" cx="42" cy="52" r="5" />
+      <circle class="type" style="--i:1" cx="60" cy="52" r="5" />
+      <circle class="type" style="--i:2" cx="78" cy="52" r="5" />
+    </Fragment>
+  )}
+
+  {name === 'error' && (
+    <Fragment>
+      <path class="s" d="M8 60H40L48 46" />
+      <path class="s" d="M112 60H80L72 74" />
+      <path class="p" d="M8 60H40L48 46" pathLength="1" />
+      <path class="spark" style="--i:0" d="M56 50l4-6M60 60h8M54 68l-4 6" />
+      <path class="spark" style="--i:1" d="M64 52l6-4M58 64l6 4" />
+      <circle class="node" cx="8" cy="60" r="4" />
+      <circle class="node" cx="112" cy="60" r="4" />
+    </Fragment>
+  )}
+
+  {name === 'objetivo' && (
+    <Fragment>
+      <circle class="w" cx="60" cy="60" r="46" />
+      <circle class="w" cx="60" cy="60" r="30" />
+      <circle class="s" cx="60" cy="60" r="14" />
+      <path class="w" d="M60 6V30M60 90V114M6 60H30M90 60H114" />
+      <circle class="ring" cx="60" cy="60" r="14" />
+      <circle class="s fill" cx="60" cy="60" r="4" />
+      <path class="p" d="M60 6V46" pathLength="1" />
+      <path class="p" style="--i:1" d="M114 60H74" pathLength="1" />
+    </Fragment>
+  )}
+</svg>
+
+<style>
+  .sicon {
+    --g: 134 202 40;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 0 6px rgb(var(--g) / 0.45));
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .w {
+    stroke: rgb(var(--g) / 0.32);
+    stroke-width: 1.25;
+  }
+  .w path {
+    stroke: inherit;
+  }
+  .dashed {
+    stroke-dasharray: 4 4;
+  }
+  .s {
+    stroke: rgb(var(--g));
+    stroke-width: 1.75;
+  }
+  .fill {
+    fill: rgb(var(--g));
+  }
+  .ink {
+    stroke: #0b0d0b;
+    stroke-width: 2.25;
+  }
+  .tile {
+    fill: rgb(var(--g));
+  }
+  .dot {
+    fill: rgb(var(--g));
+  }
+  .node {
+    fill: #0b0e0b;
+    stroke: rgb(var(--g));
+    stroke-width: 1.5;
+  }
+  .node--on {
+    fill: rgb(var(--g));
+    animation: blink 2.4s ease-in-out infinite;
+  }
+
+  /* Pulso de luz que recorre una línea */
+  .p {
+    stroke: #eaffd1;
+    stroke-width: 2.5;
+    stroke-dasharray: 0.12 0.88;
+    stroke-dashoffset: 1;
+    animation: travel 2.6s linear infinite;
+    animation-delay: calc(var(--i, 0) * -1.3s);
+    filter: drop-shadow(0 0 4px rgb(var(--g)));
+  }
+  @keyframes travel {
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Diseño web: bloques que se construyen y cursor que hace clic */
+  .draw {
+    stroke: rgb(var(--g) / 0.85);
+    stroke-width: 1.5;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: draw 4.5s var(--ease) infinite;
+    animation-delay: calc(var(--i) * 0.35s);
+  }
+  @keyframes draw {
+    0% {
+      stroke-dashoffset: 1;
+    }
+    35%,
+    85% {
+      stroke-dashoffset: 0;
+      opacity: 1;
+    }
+    100% {
+      stroke-dashoffset: 0;
+      opacity: 0;
+    }
+  }
+  .cursor {
+    animation: cursor 4.5s var(--ease) infinite;
+  }
+  @keyframes cursor {
+    0%,
+    100% {
+      transform: translate(10px, 12px);
+    }
+    40%,
+    70% {
+      transform: translate(0, 0);
+    }
+  }
+  .ripple {
+    stroke: rgb(var(--g));
+    stroke-width: 1.5;
+    transform-box: fill-box;
+    transform-origin: center;
+    opacity: 0;
+    animation: ripple 4.5s ease-out infinite;
+  }
+  @keyframes ripple {
+    0%,
+    45% {
+      opacity: 0;
+      transform: scale(0.5);
+    }
+    50% {
+      opacity: 1;
+    }
+    70%,
+    100% {
+      opacity: 0;
+      transform: scale(3.2);
+    }
+  }
+
+  /* Marketing: contactos que caen en el embudo y uno sale convertido */
+  .drop {
+    fill: rgb(var(--g) / 0.85);
+    animation: drop 3s ease-in infinite;
+    animation-delay: calc(var(--i) * 0.45s);
+  }
+  @keyframes drop {
+    0% {
+      transform: translateY(0);
+      opacity: 0;
+    }
+    15% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(46px);
+      opacity: 0;
+    }
+  }
+  .out {
+    fill: #eaffd1;
+    animation: out 3s ease-in-out infinite;
+  }
+  @keyframes out {
+    0%,
+    55% {
+      transform: translateY(-30px);
+      opacity: 0;
+    }
+    80% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(8px);
+      opacity: 0;
+    }
+  }
+
+  /* IA: neuronas que se activan en cascada */
+  .neuron {
+    fill: #0b0e0b;
+    stroke: rgb(var(--g));
+    stroke-width: 1.5;
+    animation: neuron 2.8s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.18s);
+  }
+  .neuron--out {
+    stroke-width: 2;
+  }
+  @keyframes neuron {
+    0%,
+    100% {
+      fill: #0b0e0b;
+    }
+    20% {
+      fill: rgb(var(--g));
+    }
+    45% {
+      fill: #0b0e0b;
+    }
+  }
+
+  /* Software: módulo que encaja */
+  .slot {
+    animation: slot 3.6s var(--ease) infinite;
+  }
+  @keyframes slot {
+    0%,
+    15% {
+      transform: translate(14px, 14px);
+      opacity: 0;
+    }
+    45%,
+    85% {
+      transform: none;
+      opacity: 1;
+    }
+    100% {
+      transform: none;
+      opacity: 0;
+    }
+  }
+
+  /* A medida: pieza que encaja */
+  .piece {
+    animation: piece 3.6s var(--ease) infinite;
+  }
+  @keyframes piece {
+    0%,
+    15% {
+      transform: translateX(16px);
+      opacity: 0.35;
+    }
+    45%,
+    85% {
+      transform: none;
+      opacity: 1;
+    }
+    100% {
+      transform: none;
+      opacity: 0.35;
+    }
+  }
+
+  /* Consultoría: radar */
+  .sweep {
+    transform-origin: 60px 60px;
+    animation: spin 4s linear infinite;
+  }
+  .sweep__cone {
+    fill: rgb(var(--g) / 0.18);
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .blip {
+    fill: rgb(var(--g));
+    opacity: 0;
+    animation: blip 4s ease-out infinite;
+    animation-delay: calc(0.6s + var(--i) * 1.2s);
+  }
+  @keyframes blip {
+    0% {
+      opacity: 1;
+    }
+    60%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* Contacto: escribiendo... */
+  .type {
+    fill: rgb(var(--g));
+    animation: type 1.4s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.18s);
+  }
+  @keyframes type {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+      opacity: 0.35;
+    }
+    30% {
+      transform: translateY(-6px);
+      opacity: 1;
+    }
+  }
+
+  /* Error: chispas */
+  .spark {
+    stroke: #eaffd1;
+    stroke-width: 1.75;
+    animation: spark 1.2s steps(2) infinite;
+    animation-delay: calc(var(--i) * 0.3s);
+  }
+  @keyframes spark {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  /* Objetivo */
+  .ring {
+    stroke: rgb(var(--g));
+    stroke-width: 1.5;
+    transform-origin: 60px 60px;
+    animation: ring 2.4s ease-out infinite;
+  }
+  @keyframes ring {
+    from {
+      transform: scale(1);
+      opacity: 0.9;
+    }
+    to {
+      transform: scale(3.2);
+      opacity: 0;
+    }
+  }
+  @keyframes blink {
+    50% {
+      opacity: 0.55;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .sicon * {
+      animation: none !important;
+    }
+    .draw {
+      stroke-dashoffset: 0;
+    }
+    .p,
+    .drop,
+    .out,
+    .ripple,
+    .blip {
+      display: none;
+    }
+  }
+</style>

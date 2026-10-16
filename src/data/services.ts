@@ -1,11 +1,4 @@
-import type { ImageMetadata } from 'astro';
-import imgDisenoWeb from '@/assets/3d/diseno-web.png';
-import imgMarketing from '@/assets/3d/marketing.png';
-import imgAutomatizacion from '@/assets/3d/automatizacion.png';
-import imgIA from '@/assets/3d/inteligencia-artificial.png';
-import imgSoftware from '@/assets/3d/software.png';
-import imgAMedida from '@/assets/3d/software-a-medida.png';
-import imgConsultoria from '@/assets/3d/consultoria.png';
+import type { ServiceIconName } from '@/components/ServiceIcon.astro';
 
 /**
  * Catálogo de servicios.
@@ -27,8 +20,7 @@ export interface Service {
   name: string;
   navLabel: string;
   stage: Stage;
-  image: ImageMetadata;
-  imageAlt: string;
+  icon: ServiceIconName;
   seo: { title: string; description: string };
   hero: { eyebrow: string; title: string; lead: string };
   card: { title: string; text: string };
@@ -45,12 +37,11 @@ export interface Service {
 export const services: Service[] = [
   {
     slug: 'diseno-web',
+    icon: 'diseno-web',
     order: 1,
     name: 'Diseño web',
     navLabel: 'Diseño web',
     stage: 'Convertir',
-    image: imgDisenoWeb,
-    imageAlt: 'Ventana de navegador en cerámica con un cursor verde',
     seo: {
       title: 'Diseño web para pymes que convierte visitas en clientes',
       description:
@@ -101,12 +92,11 @@ export const services: Service[] = [
   },
   {
     slug: 'marketing',
+    icon: 'marketing',
     order: 2,
     name: 'Marketing digital',
     navLabel: 'Marketing digital',
     stage: 'Atraer',
-    image: imgMarketing,
-    imageAlt: 'Imán de cerámica negro y verde atrayendo esferas',
     seo: {
       title: 'Marketing digital para pymes: captación medible',
       description:
@@ -156,12 +146,11 @@ export const services: Service[] = [
   },
   {
     slug: 'automatizacion',
+    icon: 'automatizacion',
     order: 3,
     name: 'Automatización e integraciones',
     navLabel: 'Automatización',
     stage: 'Automatizar',
-    image: imgAutomatizacion,
-    imageAlt: 'Cadena de fichas de dominó de cerámica empujada por una ficha verde',
     seo: {
       title: 'Automatización de procesos e integraciones para pymes',
       description:
@@ -212,12 +201,11 @@ export const services: Service[] = [
   },
   {
     slug: 'inteligencia-artificial',
+    icon: 'inteligencia-artificial',
     order: 4,
     name: 'Inteligencia artificial',
     navLabel: 'Inteligencia artificial',
     stage: 'Automatizar',
-    image: imgIA,
-    imageAlt: 'Capas de cristal atravesadas por una esfera verde luminosa',
     seo: {
       title: 'Inteligencia artificial aplicada para pymes',
       description:
@@ -267,12 +255,11 @@ export const services: Service[] = [
   },
   {
     slug: 'software',
+    icon: 'software',
     order: 5,
     name: 'Software y aplicaciones',
     navLabel: 'Software y aplicaciones',
     stage: 'Escalar',
-    image: imgSoftware,
-    imageAlt: 'Bloques modulares de cerámica apilados con una pieza verde encajando',
     seo: {
       title: 'Desarrollo de software y aplicaciones para pymes',
       description:
@@ -322,13 +309,12 @@ export const services: Service[] = [
   },
   {
     slug: 'software/a-medida',
+    icon: 'software-a-medida',
     parent: 'software',
     order: 1,
     name: 'Software a medida',
     navLabel: 'Software a medida',
     stage: 'Escalar',
-    image: imgAMedida,
-    imageAlt: 'Llave de cerámica negra con un corte único y anilla verde',
     seo: {
       title: 'Software a medida para pymes: hecho para tu proceso',
       description:
@@ -377,12 +363,11 @@ export const services: Service[] = [
   },
   {
     slug: 'consultoria',
+    icon: 'consultoria',
     order: 6,
     name: 'Consultoría',
     navLabel: 'Consultoría',
     stage: 'Dirigir',
-    image: imgConsultoria,
-    imageAlt: 'Brújula de cerámica con aguja verde',
     seo: {
       title: 'Consultoría digital para pymes: plan antes que herramientas',
       description:

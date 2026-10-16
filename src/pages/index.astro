@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Button from '@/components/Button.astro';
 import Icon from '@/components/Icon.astro';
@@ -10,8 +10,7 @@ import Faq from '@/components/Faq.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import { topServices } from '@/data/services';
 import { site } from '@/data/site';
-import hero from '@/assets/3d/hero-maquina.png';
-import nivel from '@/assets/3d/sobre-nivel.png';
+import Globe from '@/components/Globe.astro';
 
 const symptoms = [
   { title: 'Si tú no estás, no se vende.', text: 'Los presupuestos, el seguimiento y las respuestas esperan a que tengas un hueco. Y los clientes no esperan.' },
@@ -54,35 +53,34 @@ const schema = [
 
 <BaseLayout title="Agencia digital para pymes" description={site.description} schema={schema}>
   <!-- HERO -->
-  <section class="hero">
+  <section class="hero tech-grid">
+    <div class="hero__glow" aria-hidden="true"></div>
     <div class="container hero__grid">
       <div class="hero__copy">
-        <p class="eyebrow" data-reveal>Agencia digital para pymes</p>
+        <p class="eyebrow" data-reveal>Agencia digital · Tecnología para pymes</p>
         <h1 class="hero__title" data-reveal style="--d:1">
-          Que tu negocio venda más y dependa <em>menos de ti.</em>
+          Hacemos que tu negocio <span class="hero__green">venda más</span> y dependa <em>menos de ti.</em>
         </h1>
         <p class="lead hero__lead" data-reveal style="--d:2">
-          Diseñamos webs, captación, automatizaciones e inteligencia artificial que trabajan juntas, como un sistema. Tu negocio gana tracción. Tú recuperas tiempo.
+          Estrategia, diseño, marketing, automatización e inteligencia artificial conectados como un solo sistema. Tu negocio gana tracción. Tú recuperas tiempo.
         </p>
         <div class="btn-row" data-reveal style="--d:3">
-          <Button href="/contacto/" variant="green">Cuéntanos tu caso</Button>
-          <Button href="/servicios/" variant="ghost">Ver servicios</Button>
+          <Button href="/contacto/" variant="green">Hablemos de tu proyecto</Button>
+          <Button href="/servicios/" variant="ghost">Ver qué hacemos</Button>
         </div>
+        <ul role="list" class="hero__stats" data-reveal style="--d:4">
+          <li><strong>24/7</strong><span>Tu sistema trabajando</span></li>
+          <li><strong>6</strong><span>Disciplinas, un equipo</span></li>
+          <li><strong>100%</strong><span>Tuyo: código y cuentas</span></li>
+        </ul>
       </div>
-      <div class="hero__art" data-reveal="scale" style="--d:2">
-        <div class="hero__halo" aria-hidden="true"></div>
-        <Image
-          src={hero}
-          alt="Máquina escultórica de canicas verdes que recorren raíles negros y un globo de alambre: un sistema que funciona solo"
-          widths={[420, 640, 900, 1200]}
-          sizes="(min-width: 1024px) 40vw, 86vw"
-          loading="eager"
-          fetchpriority="high"
-          class="hero__img float float--slow"
-        />
-        <div class="hero__tag hero__tag--a" aria-hidden="true"><span class="dot"></span> Nuevo contacto → CRM</div>
+      <div class="hero__art" data-reveal="fade" style="--d:1">
+        <Globe class="hero__globe" />
+        <div class="hero__tag hero__tag--a" aria-hidden="true"><span class="dot"></span> Nuevo cliente</div>
         <div class="hero__tag hero__tag--b" aria-hidden="true"><Icon name="check" size={14} /> Presupuesto enviado</div>
-        <div class="hero__tag hero__tag--c" aria-hidden="true"><Icon name="clock" size={14} /> 03:12 · Mientras dormías</div>
+        <div class="hero__tag hero__tag--c" aria-hidden="true"><Icon name="spark" size={14} /> Proceso automatizado</div>
+        <div class="hero__tag hero__tag--d" aria-hidden="true"><Icon name="clock" size={14} /> 03:12 · Mientras dormías</div>
+        <p class="hero__hint mono" aria-hidden="true">Arrastra para girar</p>
       </div>
     </div>
 
@@ -198,7 +196,7 @@ const schema = [
   <section class="section section--sand commitments">
     <div class="container commitments__grid">
       <div class="commitments__art" data-reveal="scale">
-        <Image src={nivel} alt="Nivel de burbuja de cerámica negra con la burbuja verde centrada" widths={[360, 560, 800]} sizes="(min-width: 900px) 34vw, 80vw" loading="lazy" class="float float--delay" />
+        <ServiceIcon name="objetivo" />
       </div>
       <div>
         <div class="commitments__head" data-reveal>
@@ -228,12 +226,35 @@ const schema = [
 <style>
   /* HERO */
   .hero {
-    padding-top: clamp(1.5rem, 1rem + 3vw, 4rem);
+    position: relative;
+    padding-top: clamp(1rem, 0.5rem + 2vw, 2.5rem);
     overflow: hidden;
+    margin-top: -5.25rem;
+    padding-top: calc(5.25rem + clamp(1rem, 0.5rem + 2vw, 2.5rem));
+    mask-image: none;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 0;
+    height: 30%;
+    background: linear-gradient(transparent, var(--bg));
+    pointer-events: none;
+  }
+  .hero__glow {
+    position: absolute;
+    right: -15%;
+    top: 0;
+    width: 75%;
+    aspect-ratio: 1;
+    background: radial-gradient(closest-side, rgb(134 202 40 / 0.16), transparent 70%);
+    pointer-events: none;
   }
   .hero__grid {
+    position: relative;
+    z-index: 1;
     display: grid;
-    gap: 2.5rem;
+    gap: 1rem;
     align-items: center;
   }
   .hero__copy {
@@ -242,11 +263,14 @@ const schema = [
     justify-items: start;
   }
   .hero__title {
-    max-width: 12ch;
+    max-width: 13ch;
     isolation: isolate;
   }
+  .hero__green {
+    color: var(--green);
+    text-shadow: 0 0 40px rgb(134 202 40 / 0.45);
+  }
   .hero__title em {
-    color: var(--ink);
     position: relative;
     white-space: nowrap;
   }
@@ -255,11 +279,11 @@ const schema = [
     position: absolute;
     left: 0;
     right: 0.1em;
-    bottom: 0.06em;
-    height: 0.14em;
+    bottom: 0.04em;
+    height: 0.06em;
     background: var(--green);
     border-radius: 0.1em;
-    z-index: -1;
+    box-shadow: 0 0 16px rgb(134 202 40 / 0.8);
     transform-origin: left;
     animation: underline 1.2s 0.8s var(--ease) both;
   }
@@ -271,38 +295,52 @@ const schema = [
   .hero__lead {
     max-width: 34rem;
   }
+  .hero__stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem 2.5rem;
+    margin-top: 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid var(--line);
+  }
+  .hero__stats li {
+    display: grid;
+    gap: 0.15rem;
+  }
+  .hero__stats strong {
+    font-size: 1.75rem;
+    font-weight: 560;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+  .hero__stats span {
+    font-size: 0.8125rem;
+    color: var(--muted);
+  }
   .hero__art {
     position: relative;
     justify-self: center;
-    width: min(100%, 34rem);
-  }
-  .hero__halo {
-    position: absolute;
-    inset: 12% 6% 4%;
-    border-radius: 50%;
-    background: radial-gradient(closest-side, rgb(134 202 40 / 0.35), rgb(134 202 40 / 0) 70%);
-    filter: blur(20px);
-  }
-  .hero__img {
-    position: relative;
-    width: 82%;
-    margin-inline: auto;
-    filter: drop-shadow(0 40px 40px rgb(20 23 20 / 0.12));
+    width: min(118%, 46rem);
+    margin-inline: -9%;
   }
   .hero__tag {
     position: absolute;
+    z-index: 2;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.55rem 0.9rem;
+    padding: 0.55rem 0.95rem;
     border-radius: 999px;
-    background: var(--white);
+    background: rgb(17 20 17 / 0.62);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     box-shadow:
-      0 1px 0 var(--line),
-      0 14px 30px -12px rgb(20 23 20 / 0.25);
+      inset 0 0 0 1px rgb(134 202 40 / 0.3),
+      0 14px 30px -12px rgb(0 0 0 / 0.6);
     font-size: 0.8125rem;
     font-weight: 550;
     white-space: nowrap;
+    pointer-events: none;
     animation: float 6s ease-in-out infinite;
   }
   .hero__tag .dot {
@@ -310,33 +348,55 @@ const schema = [
     height: 0.5rem;
     border-radius: 50%;
     background: var(--green);
-    box-shadow: 0 0 0 3px rgb(134 202 40 / 0.25);
+    box-shadow: 0 0 10px var(--green);
   }
   .hero__tag :global(svg) {
-    color: var(--green-ink);
+    color: var(--green);
   }
   .hero__tag--a {
-    top: 14%;
-    left: -2%;
+    top: 18%;
+    left: 6%;
   }
   .hero__tag--b {
-    top: 48%;
-    right: -3%;
+    top: 34%;
+    right: 2%;
     animation-delay: -2s;
   }
   .hero__tag--c {
-    bottom: 10%;
-    left: 4%;
-    background: var(--ink);
-    color: var(--paper);
-    animation-delay: -4s;
+    bottom: 26%;
+    right: 6%;
+    animation-delay: -3.5s;
   }
-  .hero__tag--c :global(svg) {
-    color: var(--green);
+  .hero__tag--d {
+    bottom: 14%;
+    left: 10%;
+    animation-delay: -5s;
+  }
+  .hero__hint {
+    position: absolute;
+    left: 50%;
+    bottom: 2%;
+    transform: translateX(-50%);
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+    opacity: 0.7;
+  }
+  @media (max-width: 600px) {
+    .hero__tag {
+      font-size: 0.75rem;
+      padding: 0.45rem 0.75rem;
+    }
+    .hero__tag--c,
+    .hero__hint {
+      display: none;
+    }
   }
 
   .ticker {
-    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+    position: relative;
+    z-index: 1;
+    margin-top: clamp(1.5rem, 1rem + 2vw, 3rem);
     border-block: 1px solid var(--line);
     overflow: hidden;
     mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
@@ -374,12 +434,14 @@ const schema = [
   }
   @media (min-width: 1024px) {
     .hero__grid {
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 3rem;
-      min-height: min(78vh, 46rem);
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      min-height: min(86vh, 50rem);
     }
     .hero__art {
-      width: 100%;
+      width: 112%;
+      max-width: none;
+      margin: 0 -8% 0 -4%;
     }
   }
 
@@ -472,8 +534,8 @@ const schema = [
     gap: 1.25rem;
     padding: 1.75rem;
     border-radius: var(--radius);
-    background: var(--white);
-    box-shadow: 0 1px 0 var(--line);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
   }
   .method__num {
     display: grid;

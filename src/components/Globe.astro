@@ -1,0 +1,333 @@
+---
+/**
+ * Globo interactivo del hero: Canvas 2D, sin dependencias.
+ * - Gira solo, se puede arrastrar (con inercia) y se pausa fuera de pantalla.
+ * - Conexiones desde España con pulsos de luz que viajan por los arcos.
+ * - Con "reducir movimiento" se dibuja un único fotograma estático.
+ * Los puntos de tierra se generan con `node scripts/build-globe.mjs`.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<div class:list={['globe', className]} data-globe>
+  <canvas aria-hidden="true"></canvas>
+  <slot />
+</div>
+
+<script>
+  import dots from '@/data/globe-dots.json';
+
+  type V3 = [number, number, number];
+  const DEG = Math.PI / 180;
+  const GREEN = '134, 202, 40';
+
+  const HUB = { lat: 40.4, lon: -3.7 }; // Madrid
+  const CITIES = [
+    { lat: 19.4, lon: -99.1 }, // CDMX
+    { lat: 4.7, lon: -74.1 }, // Bogotá
+    { lat: -34.6, lon: -58.4 }, // Buenos Aires
+    { lat: 40.7, lon: -74.0 }, // Nueva York
+    { lat: 51.5, lon: -0.1 }, // Londres
+    { lat: 48.9, lon: 2.35 }, // París
+    { lat: 52.5, lon: 13.4 }, // Berlín
+    { lat: 38.7, lon: -9.1 }, // Lisboa
+    { lat: 25.8, lon: -80.2 }, // Miami
+    { lat: -33.4, lon: -70.7 }, // Santiago
+    { lat: 25.2, lon: 55.3 }, // Dubái
+    { lat: 45.5, lon: 9.2 }, // Milán
+    { lat: 33.6, lon: -7.6 }, // Casablanca
+  ];
+
+  const toVec = (lat: number, lon: number): V3 => {
+    const la = lat * DEG;
+    const lo = lon * DEG;
+    return [Math.cos(la) * Math.sin(lo), Math.sin(la), Math.cos(la) * Math.cos(lo)];
+  };
+
+  // Puntos de tierra precalculados como vectores unitarios
+  const land: V3[] = [];
+  for (let i = 0; i < dots.length; i += 2) land.push(toVec(dots[i] / 10, dots[i + 1] / 10));
+
+  // Arcos de círculo máximo elevados sobre la superficie
+  const slerp = (a: V3, b: V3, t: number): V3 => {
+    const d = Math.min(1, Math.max(-1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]));
+    const w = Math.acos(d);
+    if (w < 1e-6) return a;
+    const s = Math.sin(w);
+    const k1 = Math.sin((1 - t) * w) / s;
+    const k2 = Math.sin(t * w) / s;
+    return [a[0] * k1 + b[0] * k2, a[1] * k1 + b[1] * k2, a[2] * k1 + b[2] * k2];
+  };
+  const hub = toVec(HUB.lat, HUB.lon);
+  const arcs = CITIES.map((c, i) => {
+    const end = toVec(c.lat, c.lon);
+    const ang = Math.acos(hub[0] * end[0] + hub[1] * end[1] + hub[2] * end[2]);
+    const h = 0.06 + ang * 0.16;
+    const pts: V3[] = [];
+    const STEPS = 48;
+    for (let s = 0; s <= STEPS; s++) {
+      const t = s / STEPS;
+      const p = slerp(hub, end, t);
+      const r = 1 + Math.sin(Math.PI * t) * h;
+      pts.push([p[0] * r, p[1] * r, p[2] * r]);
+    }
+    return { pts, end, offset: (i * 0.37) % 1, speed: 0.16 + (i % 4) * 0.03 };
+  });
+
+  document.querySelectorAll<HTMLElement>('[data-globe]').forEach((root) => {
+    const canvas = root.querySelector('canvas')!;
+    const ctx = canvas.getContext('2d')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    let W = 0;
+    let H = 0;
+    let R = 0;
+    let dpr = 1;
+    let rotY = 28 * DEG; // centra el Atlántico y España
+    let tilt = 20 * DEG;
+    let velY = 0;
+    let dragging = false;
+    let lastX = 0;
+    let lastY = 0;
+    let visible = true;
+    let raf = 0;
+    let last = performance.now();
+    let clock = 0;
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      W = rect.width;
+      H = rect.height;
+      canvas.width = Math.round(W * dpr);
+      canvas.height = Math.round(H * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      R = Math.min(W, H) * 0.44;
+    };
+
+    // Rotación (eje Y) + inclinación (eje X) y proyección ortográfica
+    const project = (v: V3) => {
+      const cy = Math.cos(rotY);
+      const sy = Math.sin(rotY);
+      const x = v[0] * cy + v[2] * sy;
+      const z0 = -v[0] * sy + v[2] * cy;
+      const ct = Math.cos(tilt);
+      const st = Math.sin(tilt);
+      const y = v[1] * ct - z0 * st;
+      const z = v[1] * st + z0 * ct;
+      return { x: W / 2 + x * R, y: H / 2 - y * R, z };
+    };
+
+    const draw = () => {
+      ctx.clearRect(0, 0, W, H);
+      const cx = W / 2;
+      const cy = H / 2;
+
+      // Atmósfera
+      const atm = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.35);
+      atm.addColorStop(0, `rgba(${GREEN}, 0.22)`);
+      atm.addColorStop(0.35, `rgba(${GREEN}, 0.07)`);
+      atm.addColorStop(1, `rgba(${GREEN}, 0)`);
+      ctx.fillStyle = atm;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R * 1.35, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Esfera
+      const body = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R);
+      body.addColorStop(0, '#1d2a1a');
+      body.addColorStop(0.6, '#0f150e');
+      body.addColorStop(1, '#070907');
+      ctx.fillStyle = body;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = `rgba(${GREEN}, 0.35)`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+
+      // Puntos de tierra
+      const size = Math.max(1, R / 230);
+      for (const v of land) {
+        const p = project(v);
+        if (p.z <= 0) continue;
+        const a = 0.18 + p.z * 0.75;
+        ctx.fillStyle = `rgba(${GREEN}, ${a})`;
+        ctx.fillRect(p.x - size / 2, p.y - size / 2, size * (0.8 + p.z * 0.6), size * (0.8 + p.z * 0.6));
+      }
+
+      // Arcos y pulsos
+      ctx.lineCap = 'round';
+      for (const arc of arcs) {
+        ctx.beginPath();
+        let started = false;
+        for (const v of arc.pts) {
+          const p = project(v);
+          if (p.z < -0.05) {
+            started = false;
+            continue;
+          }
+          if (!started) {
+            ctx.moveTo(p.x, p.y);
+            started = true;
+          } else ctx.lineTo(p.x, p.y);
+        }
+        ctx.strokeStyle = `rgba(${GREEN}, 0.35)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Pulso con estela
+        const t = (clock * arc.speed + arc.offset) % 1;
+        const n = arc.pts.length - 1;
+        for (let k = 0; k < 10; k++) {
+          const tt = t - k * 0.012;
+          if (tt < 0) break;
+          const v = arc.pts[Math.round(tt * n)];
+          const p = project(v);
+          if (p.z < -0.05) continue;
+          ctx.fillStyle = `rgba(${GREEN}, ${(1 - k / 10) * 0.95})`;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, (k === 0 ? 2.6 : 1.8) * (1 - k / 14), 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        // Destino: punto con onda
+        const e = project(arc.end);
+        if (e.z > 0) {
+          const ph = (clock * 0.6 + arc.offset) % 1;
+          ctx.strokeStyle = `rgba(${GREEN}, ${0.5 * (1 - ph) * e.z})`;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, 2 + ph * 9, 0, Math.PI * 2);
+          ctx.stroke();
+          ctx.fillStyle = `rgba(235, 255, 210, ${0.6 + e.z * 0.4})`;
+          ctx.beginPath();
+          ctx.arc(e.x, e.y, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      // Hub (España)
+      const h = project(hub);
+      if (h.z > 0) {
+        const ph = (clock * 0.8) % 1;
+        const g = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, 22);
+        g.addColorStop(0, `rgba(${GREEN}, 0.55)`);
+        g.addColorStop(1, `rgba(${GREEN}, 0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, 22, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = `rgba(${GREEN}, ${0.8 * (1 - ph)})`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, 4 + ph * 16, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = '#eaffd1';
+        ctx.beginPath();
+        ctx.arc(h.x, h.y, 3.2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Brillo especular
+      const shine = ctx.createRadialGradient(cx - R * 0.45, cy - R * 0.55, 0, cx - R * 0.45, cy - R * 0.55, R * 0.9);
+      shine.addColorStop(0, 'rgba(255,255,255,0.06)');
+      shine.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = shine;
+      ctx.beginPath();
+      ctx.arc(cx, cy, R, 0, Math.PI * 2);
+      ctx.fill();
+    };
+
+    const loop = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      clock += dt;
+      if (!dragging) {
+        velY += (0.12 - velY) * 0.02; // vuelve a la rotación automática
+        rotY += velY * dt;
+      }
+      draw();
+      raf = visible ? requestAnimationFrame(loop) : 0;
+    };
+
+    const start = () => {
+      if (!raf && !reduced) {
+        last = performance.now();
+        raf = requestAnimationFrame(loop);
+      }
+    };
+
+    resize();
+    draw();
+    root.classList.add('is-ready');
+    new ResizeObserver(() => {
+      resize();
+      draw();
+    }).observe(canvas);
+    new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      if (visible) start();
+    }).observe(root);
+    document.addEventListener('visibilitychange', () => {
+      visible = !document.hidden;
+      if (visible) start();
+    });
+
+    // Arrastrar para girar
+    canvas.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      canvas.setPointerCapture(e.pointerId);
+      root.classList.add('is-dragging');
+    });
+    canvas.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dx = e.clientX - lastX;
+      const dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      rotY += dx * 0.006;
+      velY = dx * 0.35;
+      tilt = Math.max(-60 * DEG, Math.min(60 * DEG, tilt - dy * 0.004));
+      if (reduced) draw();
+    });
+    const end = () => {
+      dragging = false;
+      root.classList.remove('is-dragging');
+    };
+    canvas.addEventListener('pointerup', end);
+    canvas.addEventListener('pointercancel', end);
+  });
+</script>
+
+<style>
+  .globe {
+    position: relative;
+    aspect-ratio: 1;
+    width: 100%;
+  }
+  .globe canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    cursor: grab;
+    touch-action: pan-y;
+    opacity: 0;
+    transform: scale(0.94);
+    transition:
+      opacity 1.2s var(--ease),
+      transform 1.6s var(--ease);
+  }
+  .globe.is-ready canvas {
+    opacity: 1;
+    transform: none;
+  }
+  .globe.is-dragging canvas {
+    cursor: grabbing;
+  }
+</style>

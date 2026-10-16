@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import Icon from './Icon.astro';
 import { serviceHref, type Service } from '@/data/services';
 
@@ -18,7 +18,7 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
     <span class="scard__arrow"><Icon name="arrow-up-right" size={18} /></span>
   </div>
   <div class="scard__art">
-    <Image src={s.image} alt={s.imageAlt} widths={[240, 400, 560]} sizes={size === 'lg' ? '(min-width: 900px) 30vw, 70vw' : '(min-width: 900px) 18vw, 50vw'} loading="lazy" />
+    <ServiceIcon name={s.icon} />
   </div>
   <div class="scard__body">
     <h3>{s.name}</h3>
@@ -35,14 +35,14 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
     padding: 1.5rem;
     min-height: 26rem;
     border-radius: var(--radius-lg);
-    background: var(--white);
-    box-shadow: 0 1px 0 var(--line);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
     overflow: hidden;
     transition: background-color 0.5s var(--ease), transform 0.6s var(--ease), box-shadow 0.5s var(--ease);
   }
   .scard:hover {
     transform: translateY(-4px);
-    box-shadow: 0 30px 60px -30px rgb(20 23 20 / 0.35);
+    box-shadow: var(--glow);
   }
   .scard__top {
     display: flex;
@@ -52,7 +52,7 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
   .scard__stage {
     padding: 0.3rem 0.7rem;
     border-radius: 999px;
-    background: var(--paper);
+    background: var(--surface-2);
     text-transform: uppercase;
     font-size: 0.6875rem;
   }
@@ -76,15 +76,13 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
     place-items: center;
     padding: 0.5rem 1rem;
   }
-  .scard__art :global(img) {
-    width: auto;
-    max-width: 72%;
-    max-height: 11rem;
-    object-fit: contain;
-    transition: transform 0.8s var(--ease-spring);
+  .scard__art :global(.sicon) {
+    width: min(9rem, 60%);
+    transition: transform 0.8s var(--ease-spring), filter 0.4s;
   }
-  .scard:hover .scard__art :global(img) {
-    transform: scale(1.06) rotate(-3deg);
+  .scard:hover .scard__art :global(.sicon) {
+    transform: scale(1.06);
+    filter: drop-shadow(0 0 14px rgb(134 202 40 / 0.7));
   }
   .scard__body h3 {
     font-size: 1.5rem;
@@ -96,8 +94,8 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
     line-height: 1.5;
     max-width: 34ch;
   }
-  .scard--lg .scard__art :global(img) {
-    max-height: 15rem;
+  .scard--lg .scard__art :global(.sicon) {
+    width: min(11rem, 50%);
   }
   @media (min-width: 1024px) {
     .scard.is-full {
@@ -108,7 +106,10 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
       align-items: center;
       gap: 2rem;
       padding: 2rem 2rem 2rem 2.5rem;
-      background: var(--green);
+      background:
+        radial-gradient(60% 120% at 60% 50%, rgb(134 202 40 / 0.12), transparent 70%),
+        var(--surface);
+      box-shadow: inset 0 0 0 1px rgb(134 202 40 / 0.3);
     }
     .scard.is-full .scard__body {
       grid-area: body;
@@ -117,15 +118,14 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
       font-size: var(--fs-xl);
     }
     .scard.is-full .scard__body p {
-      color: var(--ink);
       font-size: var(--fs-md);
     }
     .scard.is-full .scard__art {
       grid-area: art;
       padding: 0;
     }
-    .scard.is-full .scard__art :global(img) {
-      max-height: 10rem;
+    .scard.is-full .scard__art :global(.sicon) {
+      width: 8rem;
     }
     .scard.is-full .scard__top {
       grid-area: top;
@@ -136,13 +136,7 @@ const { service: s, index, size = 'md', class: className } = Astro.props;
       align-items: flex-end;
     }
     .scard.is-full .scard__stage {
-      background: var(--ink);
       color: var(--green);
-    }
-    .scard.is-full .scard__arrow {
-      background: var(--ink);
-      color: var(--green);
-      box-shadow: none;
     }
   }
   .scard--lg .scard__body h3 {

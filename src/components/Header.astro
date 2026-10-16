@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import Button from './Button.astro';
@@ -34,7 +34,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
                 {topServices.map((s) => (
                   <li>
                     <a href={serviceHref(s)} class="mega__card">
-                      <Image src={s.image} alt="" width={96} height={96} class="mega__img" loading="lazy" />
+                      <span class="mega__img"><ServiceIcon name={s.icon} /></span>
                       <span>
                         <span class="mega__name">{s.navLabel}</span>
                         <span class="mega__desc">{s.card.title}</span>
@@ -163,7 +163,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     content: '';
     position: absolute;
     inset: 0;
-    background: rgb(242 239 233 / 0.78);
+    background: rgb(9 11 9 / 0.72);
     backdrop-filter: blur(16px) saturate(1.4);
     -webkit-backdrop-filter: blur(16px) saturate(1.4);
     opacity: 0;
@@ -211,7 +211,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
   }
   .nav__link:hover,
   .nav__item--mega.is-open .nav__link {
-    background: rgb(20 23 20 / 0.06);
+    background: rgb(242 239 233 / 0.07);
   }
   .nav__link.is-active {
     box-shadow: inset 0 -2px 0 -0.0rem transparent;
@@ -244,8 +244,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     border-radius: 50%;
     display: grid;
     place-items: center;
-    background: var(--ink);
+    background: var(--surface-2);
     color: var(--paper);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
     position: relative;
     z-index: 2;
     transition: background-color 0.3s;
@@ -282,12 +283,10 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     top: 4px;
     transform: rotate(-45deg);
   }
-  .header__logo :global(.logo-d),
-  .menu-open .header__logo :global(.logo-l) {
+  .header__logo :global(.logo-l) {
     display: none;
   }
-  .menu-open .header__logo :global(.logo-d) {
-    display: inline-block;
+  .header__logo :global(.logo-d) {
     width: 100%;
   }
 
@@ -316,7 +315,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     grid-template-columns: 17rem 1fr;
     gap: 2rem;
     padding: 2rem;
-    background: var(--white);
+    background: var(--surface);
     border-radius: var(--radius-lg);
     box-shadow:
       0 1px 0 var(--line),
@@ -327,7 +326,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     flex-direction: column;
     gap: 1rem;
     padding: 1.25rem;
-    background: var(--paper);
+    background: var(--surface-2);
     border-radius: var(--radius);
   }
   .mega__title {
@@ -356,17 +355,22 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     transition: background-color 0.2s;
   }
   .mega__card:hover {
-    background: var(--paper);
+    background: var(--surface-2);
   }
   .mega__img {
+    display: grid;
+    place-items: center;
     width: 3.5rem;
     height: 3.5rem;
-    object-fit: contain;
+    padding: 0.55rem;
+    border-radius: 12px;
+    background: var(--surface-2);
+    box-shadow: inset 0 0 0 1px var(--line);
     flex-shrink: 0;
     transition: transform 0.5s var(--ease-spring);
   }
   .mega__card:hover .mega__img {
-    transform: scale(1.1) rotate(-4deg);
+    transform: scale(1.08);
   }
   .mega__name {
     display: block;
@@ -390,7 +394,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWit
     color: var(--green-ink);
   }
   .mega__child:hover {
-    color: var(--ink);
+    color: var(--fg);
   }
 
   /* Menú móvil */

@@ -1,11 +1,10 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import Icon from '@/components/Icon.astro';
 import { topServices } from '@/data/services';
 import { site } from '@/data/site';
-import bubble from '@/assets/3d/contacto-burbuja.png';
 
 const breadcrumbs = [{ label: 'Contacto', href: '/contacto/' }];
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
@@ -66,7 +65,7 @@ const schema = [
           </ul>
 
           <div class="contact__art" aria-hidden="true">
-            <Image src={bubble} alt="" widths={[280, 440]} sizes="(min-width: 1024px) 18vw, 40vw" loading="eager" class="float float--slow" />
+            <ServiceIcon name="contacto" />
           </div>
         </aside>
 
@@ -301,7 +300,7 @@ const schema = [
     word-break: break-word;
   }
   .channel:hover {
-    background: var(--white);
+    background: var(--surface);
   }
   .channel small {
     display: block;
@@ -319,8 +318,9 @@ const schema = [
     width: 3rem;
     height: 3rem;
     border-radius: 50%;
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--surface-2);
+    color: var(--green);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
   }
   .channel__icon--green {
     background: var(--green);
@@ -334,7 +334,7 @@ const schema = [
     position: relative;
     padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
     border-radius: var(--radius-lg);
-    background: var(--white);
+    background: var(--surface);
     box-shadow:
       0 1px 0 var(--line),
       0 40px 80px -50px rgb(20 23 20 / 0.35);
@@ -392,11 +392,11 @@ const schema = [
     transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
   }
   .pick:hover span {
-    box-shadow: inset 0 0 0 1px var(--ink);
+    box-shadow: inset 0 0 0 1px var(--paper);
   }
   .pick input:checked + span {
-    background: var(--ink);
-    color: var(--paper);
+    background: var(--green);
+    color: var(--ink);
     box-shadow: none;
   }
   .pick input:checked + span::before {
@@ -404,10 +404,10 @@ const schema = [
     width: 0.45rem;
     height: 0.45rem;
     border-radius: 50%;
-    background: var(--green);
+    background: var(--ink);
   }
   .pick input:focus-visible + span {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--green);
     outline-offset: 2px;
   }
   .field input,
@@ -416,7 +416,7 @@ const schema = [
     padding: 0.95rem 1.1rem;
     border-radius: 14px;
     border: 0;
-    background: var(--paper);
+    background: var(--surface-2);
     box-shadow: inset 0 0 0 1px transparent;
     font-size: 1rem;
     transition: box-shadow 0.2s, background-color 0.2s;
@@ -427,7 +427,7 @@ const schema = [
   }
   .field input::placeholder,
   .field textarea::placeholder {
-    color: rgb(20 23 20 / 0.4);
+    color: rgb(242 239 233 / 0.35);
   }
   .field input:hover,
   .field textarea:hover {
@@ -436,9 +436,9 @@ const schema = [
   .field input:focus,
   .field textarea:focus {
     outline: none;
-    background: var(--white);
+    background: var(--surface-2);
     box-shadow:
-      inset 0 0 0 1.5px var(--ink),
+      inset 0 0 0 1.5px var(--green),
       0 0 0 4px rgb(134 202 40 / 0.35);
   }
   .field__error {
@@ -446,14 +446,14 @@ const schema = [
     margin-top: 0.4rem;
     font-size: 0.8125rem;
     font-weight: 500;
-    color: #b42318;
+    color: #ff7a6b;
   }
   .field.is-invalid .field__error {
     display: block;
   }
   .field.is-invalid input,
   .field.is-invalid textarea {
-    box-shadow: inset 0 0 0 1.5px #b42318;
+    box-shadow: inset 0 0 0 1.5px #ff7a6b;
   }
   .hp {
     position: absolute;
@@ -495,11 +495,11 @@ const schema = [
     color: var(--ink);
   }
   .consent input:focus-visible + .consent__box {
-    outline: 2px solid var(--ink);
+    outline: 2px solid var(--green);
     outline-offset: 2px;
   }
   .field.is-invalid .consent__box {
-    box-shadow: inset 0 0 0 1.5px #b42318;
+    box-shadow: inset 0 0 0 1.5px #ff7a6b;
   }
   .consent a,
   .form__legal a,
@@ -515,11 +515,11 @@ const schema = [
     color: var(--muted);
     padding: 1rem 1.1rem;
     border-radius: 14px;
-    background: var(--paper);
+    background: var(--surface-2);
   }
   .form__legal strong {
     font-weight: 600;
-    color: var(--ink);
+    color: var(--fg);
   }
   .form__submit {
     display: flex;

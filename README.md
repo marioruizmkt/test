@@ -13,9 +13,10 @@ npm run preview
 
 **"Que tu negocio venda más y dependa menos de ti."** La web presenta a Globalízame como quien construye un *sistema*, no piezas sueltas: cada servicio es una etapa (Atraer → Convertir → Automatizar → Escalar) con la consultoría marcando el rumbo.
 
-- **Paleta:** papel `#F2EFE9`, tinta `#141714` y verde `#86CA28` usado con intención (rellenos y acentos; para texto verde sobre papel se usa `--green-ink`, con contraste AA).
+- **Estética:** tecnológica y oscura. Fondo casi negro, texto papel `#F2EFE9` y el verde `#86CA28` como luz (brillos, pulsos, botones).
 - **Tipografía:** Inter Tight (titulares y texto), Instrument Serif en cursiva para el énfasis y JetBrains Mono para etiquetas. Autoalojadas (sin Google Fonts → sin transferencia de IP a terceros).
-- **Imagen:** objetos 3D de cerámica mate creados con Higgsfield, uno por servicio, como metáforas (imán = captación, dominó = automatización, llave = software a medida...). Están en `src/assets/3d/` y Astro los sirve optimizados en WebP.
+- **Globo interactivo** (`src/components/Globe.astro`): Canvas 2D sin librerías. Gira solo, se puede arrastrar y lanza conexiones desde España con pulsos de luz. Se pausa fuera de pantalla y respeta "reducir movimiento". Los puntos de tierra se regeneran con `node scripts/build-globe.mjs`.
+- **Iconos animados** (`src/components/ServiceIcon.astro`): SVG + CSS en el mismo lenguaje que el globo (trazos, nodos y pulsos). Un icono por servicio: embudo que convierte, flujo automatizado, red neuronal, módulos que encajan, radar de consultoría...
 
 ## Estructura
 
@@ -34,7 +35,7 @@ src/
 
 ## Ampliar la web
 
-**Nuevo servicio o servicio específico:** añade una entrada en `src/data/services.ts`. Con `slug: 'diseno-web/tiendas-online'` y `parent: 'diseno-web'` se crea `/servicios/diseno-web/tiendas-online/` y aparece automáticamente en su página padre (bloque "Especialidades"), megamenú, menú móvil, pie, migas de pan, sitemap y datos estructurados.
+**Nuevo servicio o servicio específico:** añade una entrada (con su `icon`; para un icono nuevo, añádelo a `ServiceIcon.astro`) en `src/data/services.ts`. Con `slug: 'diseno-web/tiendas-online'` y `parent: 'diseno-web'` se crea `/servicios/diseno-web/tiendas-online/` y aparece automáticamente en su página padre (bloque "Especialidades"), megamenú, menú móvil, pie, migas de pan, sitemap y datos estructurados.
 
 **Blog:** copia `src/content/blog/_LEEME.md`, rellena el bloque superior y pon `draft: false`. Se publica en `/blog/<archivo>/`. Cuando haya varios artículos, crear el índice `src/pages/blog/index.astro` y añadir "Blog" a `mainNav` en `src/data/site.ts`.
 

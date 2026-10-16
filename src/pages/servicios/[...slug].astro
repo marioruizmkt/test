@@ -1,5 +1,5 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import Button from '@/components/Button.astro';
@@ -78,7 +78,7 @@ const schema = [
         </div>
         <div class="shero__art" data-reveal="scale" style="--d:2">
           <div class="shero__disc" aria-hidden="true"></div>
-          <Image src={s.image} alt={s.imageAlt} widths={[360, 560, 800]} sizes="(min-width: 1024px) 34vw, 70vw" loading="eager" fetchpriority="high" class="float" />
+          <ServiceIcon name={s.icon} />
           <span class="shero__stage mono" aria-hidden="true">{s.stage}</span>
         </div>
       </div>
@@ -136,7 +136,7 @@ const schema = [
           {children.map((c) => (
             <li data-reveal>
               <a href={serviceHref(c)} class="special">
-                <Image src={c.image} alt="" width={240} height={240} class="special__img" loading="lazy" />
+                <span class="special__img"><ServiceIcon name={c.icon} /></span>
                 <span class="special__body">
                   <span class="special__name">{c.name}</span>
                   <span class="special__text">{c.card.text}</span>
@@ -266,8 +266,10 @@ const schema = [
     position: absolute;
     inset: 6%;
     border-radius: 50%;
-    background: var(--white);
-    box-shadow: inset 0 0 0 1px var(--line);
+    background: radial-gradient(circle at 50% 50%, rgb(134 202 40 / 0.12), transparent 65%), var(--surface);
+    box-shadow:
+      inset 0 0 0 1px var(--line),
+      0 0 80px -20px rgb(134 202 40 / 0.25);
   }
   .shero__disc::after {
     content: '';
@@ -282,12 +284,9 @@ const schema = [
       transform: rotate(360deg);
     }
   }
-  .shero__art :global(img) {
+  .shero__art :global(.sicon) {
     position: relative;
-    width: 68%;
-    max-height: 78%;
-    object-fit: contain;
-    filter: drop-shadow(0 30px 30px rgb(20 23 20 / 0.12));
+    width: 52%;
   }
   .shero__stage {
     position: absolute;
@@ -362,12 +361,12 @@ const schema = [
     align-content: start;
     padding: 2rem;
     border-radius: var(--radius);
-    background: var(--white);
-    box-shadow: 0 1px 0 var(--line);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
     transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
   }
   .deliver__item:hover {
-    box-shadow: 0 24px 50px -28px rgb(20 23 20 / 0.35);
+    box-shadow: var(--glow);
   }
   .deliver__num {
     color: var(--green-ink);
@@ -407,21 +406,21 @@ const schema = [
     align-items: center;
     padding: 1.25rem 1.75rem 1.25rem 1.25rem;
     border-radius: var(--radius-lg);
-    background: var(--ink);
+    background: var(--surface);
     color: var(--paper);
-    transition: transform 0.5s var(--ease);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition: transform 0.5s var(--ease), box-shadow 0.4s;
   }
   .special:hover {
     transform: translateY(-3px);
   }
   .special__img {
+    display: block;
     width: clamp(5rem, 4rem + 4vw, 8rem);
-    height: auto;
     aspect-ratio: 1;
-    object-fit: contain;
-    background: var(--paper);
+    background: var(--surface-2);
     border-radius: var(--radius);
-    padding: 0.75rem;
+    padding: 1rem;
   }
   .special__name {
     display: block;
@@ -546,7 +545,7 @@ const schema = [
     width: 3.5rem;
     height: 3.5rem;
     border-radius: 50%;
-    background: var(--white);
+    background: var(--surface);
     box-shadow: inset 0 0 0 1px var(--line-strong);
     font-family: var(--font-mono);
     font-size: 0.875rem;

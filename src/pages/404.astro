@@ -1,9 +1,8 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Button from '@/components/Button.astro';
 import { topServices, serviceHref } from '@/data/services';
-import roto from '@/assets/3d/error-404.png';
 ---
 
 <BaseLayout title="Página no encontrada" description="Esta página no existe o ha cambiado de sitio." noindex>
@@ -22,7 +21,7 @@ import roto from '@/assets/3d/error-404.png';
         </ul>
       </div>
       <div class="nf__art">
-        <Image src={roto} alt="Raíl de canicas roto con la bola verde caída en el suelo" widths={[360, 640]} sizes="(min-width: 900px) 40vw, 80vw" loading="eager" />
+        <ServiceIcon name="error" label="Cable de datos roto con chispas verdes" />
       </div>
     </div>
   </section>
@@ -53,9 +52,9 @@ import roto from '@/assets/3d/error-404.png';
     margin-top: 1rem;
   }
   .nf__links .chip:hover {
-    background: var(--ink);
-    color: var(--paper);
-    border-color: var(--ink);
+    background: var(--green);
+    color: var(--ink);
+    border-color: var(--green);
   }
   .nf__art {
     width: min(100%, 32rem);

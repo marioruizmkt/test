@@ -1,12 +1,11 @@
 ---
-import { Image } from 'astro:assets';
+import ServiceIcon from '@/components/ServiceIcon.astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Breadcrumbs from '@/components/Breadcrumbs.astro';
 import Button from '@/components/Button.astro';
 import Icon from '@/components/Icon.astro';
 import CtaBand from '@/components/CtaBand.astro';
 import { topServices } from '@/data/services';
-import nivel from '@/assets/3d/sobre-nivel.png';
 
 const breadcrumbs = [{ label: 'Sobre nosotros', href: '/sobre/' }];
 
@@ -53,7 +52,7 @@ const howWeWork = [
         <div class="ahero__workshop" aria-hidden="true">
           {topServices.map((s, i) => (
             <div class="ahero__obj" style={`--i:${i}`} data-reveal="scale">
-              <Image src={s.image} alt="" width={220} height={220} loading="eager" class="float" style={`animation-delay:${-i * 1.3}s`} />
+              <ServiceIcon name={s.icon} />
             </div>
           ))}
         </div>
@@ -85,7 +84,7 @@ const howWeWork = [
           <h2>Cinco principios que <em>no negociamos</em>.</h2>
         </div>
         <div class="principles__art" data-reveal="scale">
-          <Image src={nivel} alt="Nivel de burbuja con la burbuja verde perfectamente centrada" widths={[320, 520]} sizes="(min-width: 900px) 24vw, 60vw" loading="lazy" class="float float--slow" />
+          <ServiceIcon name="objetivo" />
         </div>
       </div>
       <ol role="list" class="principles__list">
@@ -179,21 +178,19 @@ const howWeWork = [
     display: grid;
     place-items: center;
     border-radius: var(--radius);
-    background: var(--white);
-    box-shadow: 0 1px 0 var(--line);
+    background: var(--surface);
+    box-shadow: inset 0 0 0 1px var(--line);
     padding: 14%;
   }
-  .ahero__obj:nth-child(2),
-  .ahero__obj:nth-child(6) {
-    background: var(--paper-3);
+  .ahero__obj {
+    box-shadow: inset 0 0 0 1px var(--line);
+    background: radial-gradient(circle at 50% 60%, rgb(134 202 40 / 0.1), transparent 70%), var(--surface);
   }
   .ahero__obj:nth-child(4) {
-    background: var(--green);
+    box-shadow: var(--glow);
   }
-  .ahero__obj :global(img) {
+  .ahero__obj :global(.sicon) {
     width: 100%;
-    height: 100%;
-    object-fit: contain;
   }
   @media (min-width: 1024px) {
     .ahero__grid {
@@ -250,7 +247,7 @@ const howWeWork = [
 
   .principles__art {
     justify-self: end;
-    width: min(18rem, 60%);
+    width: min(11rem, 40%);
   }
   .principles__list {
     border-top: 1px solid var(--line-strong);
@@ -307,14 +304,14 @@ const howWeWork = [
     align-items: center;
     padding: 1.1rem 1.25rem;
     border-radius: var(--radius);
-    background: var(--white);
+    background: var(--surface);
     font-size: 1.0625rem;
     font-weight: 500;
     letter-spacing: -0.01em;
   }
   .nots__list li > span:last-child {
     text-decoration: line-through;
-    text-decoration-color: rgb(20 23 20 / 0.35);
+    text-decoration-color: rgb(242 239 233 / 0.35);
     text-decoration-thickness: 1px;
   }
   .nots__x {
@@ -324,8 +321,8 @@ const howWeWork = [
     width: 2rem;
     height: 2rem;
     border-radius: 50%;
-    background: var(--ink);
-    color: var(--paper);
+    background: rgb(134 202 40 / 0.14);
+    color: var(--green);
   }
   @media (min-width: 900px) {
     .nots__grid {
