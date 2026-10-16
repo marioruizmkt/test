@@ -1,0 +1,90 @@
+---
+/**
+ * Plantilla para contenidos editoriales (blog y sectores).
+ * Lista para la siguiente fase: solo se usa cuando hay entradas publicadas.
+ */
+import BaseLayout, { type Crumb } from './BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import { getService, type Service } from '@/data/services';
+
+interface Props {
+  title: string;
+  description: string;
+  eyebrow: string;
+  lead?: string;
+  meta?: string;
+  breadcrumbs: Crumb[];
+  services?: string[];
+  schema?: Record<string, unknown>[];
+}
+const { title, description, eyebrow, lead, meta, breadcrumbs, services = [], schema } = Astro.props;
+const related = services.map(getService).filter((s): s is Service => !!s);
+---
+
+<BaseLayout title={title} description={description} breadcrumbs={breadcrumbs} schema={schema}>
+  <article class="article">
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+      <header class="article__head">
+        <p class="eyebrow">{eyebrow}</p>
+        <h1>{title}</h1>
+        {lead && <p class="lead">{lead}</p>}
+        {meta && <p class="mono article__meta">{meta}</p>}
+      </header>
+      <slot name="before" />
+      <div class="prose article__body">
+        <slot />
+      </div>
+    </div>
+  </article>
+
+  <slot name="after" />
+
+  {related.length > 0 && (
+    <section class="section section--sand">
+      <div class="container">
+        <div class="section-head">
+          <p class="eyebrow">Servicios relacionados</p>
+        </div>
+        <div class="article__related">
+          {related.slice(0, 3).map((s, i) => <ServiceCard service={s} index={i} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  .article {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: var(--section);
+  }
+  .article__head {
+    display: grid;
+    gap: 1.5rem;
+    max-width: 52rem;
+    margin: clamp(2rem, 1rem + 3vw, 4rem) 0;
+  }
+  .article__head h1 {
+    font-size: var(--fs-2xl);
+  }
+  .article__meta {
+    color: var(--muted);
+  }
+  .article__body {
+    margin-inline: auto;
+  }
+  .article__related {
+    display: grid;
+    gap: 1.25rem;
+  }
+  @media (min-width: 900px) {
+    .article__related {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+</style>

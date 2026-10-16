@@ -1,0 +1,81 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import { site } from '@/data/site';
+
+const toc = [
+  { id: 'que-son', label: 'Qué son las cookies' },
+  { id: 'tipos', label: 'Tipos de cookies' },
+  { id: 'cuales', label: 'Cookies de esta web' },
+  { id: 'gestionar', label: 'Cómo gestionarlas' },
+  { id: 'cambios', label: 'Actualizaciones' },
+];
+
+/**
+ * Inventario de cookies y almacenamiento. Al añadir analítica o píxeles publicitarios,
+ * añade aquí cada cookie con su proveedor, finalidad y duración.
+ */
+const inventory = [
+  { name: 'gz-consent', provider: `${site.name} (propia)`, type: 'Técnica · almacenamiento local', purpose: 'Recordar tus preferencias de cookies para no volver a preguntarte.', duration: '12 meses' },
+];
+---
+
+<LegalLayout
+  title="Política de cookies"
+  path="/politica-de-cookies/"
+  description="Qué cookies usa la web de Globalízame, para qué sirven y cómo puedes aceptarlas, rechazarlas o cambiar tu elección."
+  intro="Te explicamos qué cookies usamos, para qué y cómo puedes cambiar tu elección en cualquier momento. Sin letra pequeña."
+  toc={toc}
+>
+  <h2 id="que-son">Qué son las cookies</h2>
+  <p>
+    Las cookies son pequeños archivos que una web guarda en tu navegador para recordar información sobre tu visita. Tecnologías similares, como el almacenamiento local del navegador, cumplen funciones parecidas; en esta política las llamamos a todas «cookies».
+  </p>
+
+  <h2 id="tipos">Tipos de cookies</h2>
+  <ul>
+    <li><strong>Técnicas o necesarias:</strong> permiten que la web funcione y recuerde tus preferencias. Están exentas de consentimiento.</li>
+    <li><strong>Analíticas:</strong> nos permiten medir cómo se usa la web para mejorarla. Solo se activan si las aceptas.</li>
+    <li><strong>Publicitarias:</strong> miden la eficacia de nuestras campañas. Solo se activan si las aceptas.</li>
+  </ul>
+
+  <h2 id="cuales">Cookies de esta web</h2>
+  <p>Actualmente esta web solo utiliza el siguiente elemento técnico. No instalamos cookies analíticas ni publicitarias sin tu consentimiento.</p>
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Nombre</th><th>Titular</th><th>Tipo</th><th>Finalidad</th><th>Duración</th></tr>
+      </thead>
+      <tbody>
+        {inventory.map((c) => (
+          <tr><td><code>{c.name}</code></td><td>{c.provider}</td><td>{c.type}</td><td>{c.purpose}</td><td>{c.duration}</td></tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+  <p>Si en el futuro incorporamos herramientas de analítica o publicidad, las añadiremos a esta tabla y te pediremos de nuevo tu consentimiento.</p>
+
+  <h2 id="gestionar">Cómo gestionarlas</h2>
+  <p>
+    Puedes aceptar, rechazar o configurar las cookies no necesarias desde el panel que aparece en tu primera visita. Rechazar es tan fácil como aceptar, y puedes cambiar de opinión cuando quieras:
+  </p>
+  <p><button type="button" class="btn btn--sm" data-cookie-settings>Configurar cookies</button></p>
+  <p>También puedes borrarlas o bloquearlas desde la configuración de tu navegador:</p>
+  <ul>
+    <li><a href="https://support.google.com/chrome/answer/95647" target="_blank" rel="noopener">Google Chrome</a></li>
+    <li><a href="https://support.mozilla.org/es/kb/Borrar%20cookies" target="_blank" rel="noopener">Mozilla Firefox</a></li>
+    <li><a href="https://support.apple.com/es-es/guide/safari/sfri11471/mac" target="_blank" rel="noopener">Safari</a></li>
+    <li><a href="https://support.microsoft.com/es-es/microsoft-edge" target="_blank" rel="noopener">Microsoft Edge</a></li>
+  </ul>
+
+  <h2 id="cambios">Actualizaciones</h2>
+  <p>
+    Revisaremos esta política cada vez que cambien las cookies que utilizamos. Si tienes cualquier duda, escríbenos a <a href={`mailto:${site.email}`}>{site.email}</a>.
+  </p>
+</LegalLayout>
+
+<style>
+  .prose :global(.btn) {
+    text-decoration: none;
+    padding-right: 1.1rem;
+  }
+</style>

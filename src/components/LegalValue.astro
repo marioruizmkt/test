@@ -1,0 +1,10 @@
+---
+/** Muestra un dato legal; si sigue siendo un marcador [pendiente], lo resalta para no olvidarlo. */
+interface Props {
+  value: string;
+}
+const { value } = Astro.props;
+const pending = value.startsWith('[');
+---
+
+{pending ? <mark class="todo">{value}</mark> : <Fragment>{value}</Fragment>}

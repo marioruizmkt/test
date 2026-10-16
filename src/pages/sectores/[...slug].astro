@@ -1,0 +1,43 @@
+---
+import { getCollection, render } from 'astro:content';
+import ArticleLayout from '@/layouts/ArticleLayout.astro';
+import Faq from '@/components/Faq.astro';
+
+export async function getStaticPaths() {
+  const sectors = await getCollection('sectores', ({ data }) => !data.draft);
+  return sectors.map((sector) => ({ params: { slug: sector.id }, props: { sector } }));
+}
+
+const { sector } = Astro.props;
+const { Content } = await render(sector);
+const d = sector.data;
+
+const schema = d.faqs.length
+  ? [
+      {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: d.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+      },
+    ]
+  : [];
+---
+
+<ArticleLayout
+  title={d.title}
+  description={d.description}
+  eyebrow={`Sector · ${d.name}`}
+  lead={d.lead}
+  breadcrumbs={[{ label: 'Sectores', href: '/sectores/' }, { label: d.name, href: `/sectores/${sector.id}/` }]}
+  services={d.services}
+  schema={schema}
+>
+  {d.pains.length > 0 && (
+    <>
+      <h2>Lo que solemos encontrar</h2>
+      <ul>{d.pains.map((p) => <li>{p}</li>)}</ul>
+    </>
+  )}
+  <Content />
+  {d.faqs.length > 0 && <Faq slot="after" items={d.faqs} />}
+</ArticleLayout>

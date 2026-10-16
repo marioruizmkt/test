@@ -1,0 +1,601 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import HoursCalculator from '@/components/HoursCalculator.astro';
+import Faq from '@/components/Faq.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { services, getService, childrenOf, ancestorsOf, serviceHref, type Service } from '@/data/services';
+import { site } from '@/data/site';
+import { emph, plain, pad } from '@/lib/text';
+
+export function getStaticPaths() {
+  return services.map((s) => ({ params: { slug: s.slug }, props: { service: s } }));
+}
+
+interface Props {
+  service: Service;
+}
+const { service: s } = Astro.props;
+
+const ancestors = ancestorsOf(s);
+const children = childrenOf(s.slug);
+const parent = s.parent ? getService(s.parent) : undefined;
+const related = s.related.map(getService).filter((r): r is Service => !!r && r.slug !== s.slug);
+const siblings = parent ? childrenOf(parent.slug).filter((c) => c.slug !== s.slug) : [];
+
+const breadcrumbs = [
+  { label: 'Servicios', href: '/servicios/' },
+  ...ancestors.map((a) => ({ label: a.name, href: serviceHref(a) })),
+  { label: s.name, href: serviceHref(s) },
+];
+
+const url = new URL(serviceHref(s), site.url).href;
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    '@id': `${url}#servicio`,
+    name: s.name,
+    serviceType: s.name,
+    description: s.seo.description,
+    url,
+    provider: { '@id': `${site.url}/#organizacion` },
+    areaServed: { '@type': 'Country', name: 'España' },
+    audience: { '@type': 'BusinessAudience', name: 'Pequeñas y medianas empresas' },
+    ...(parent ? { isRelatedTo: { '@type': 'Service', name: parent.name, url: new URL(serviceHref(parent), site.url).href } } : {}),
+    hasOfferCatalog: {
+      '@type': 'OfferCatalog',
+      name: s.name,
+      itemListElement: s.deliverables.map((d) => ({ '@type': 'Offer', itemOffered: { '@type': 'Service', name: d.title, description: d.text } })),
+    },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: s.faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
+---
+
+<BaseLayout title={s.seo.title} description={s.seo.description} breadcrumbs={breadcrumbs} schema={schema}>
+  <!-- HERO -->
+  <section class="shero">
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+      <div class="shero__grid">
+        <div class="shero__copy">
+          <p class="eyebrow" data-reveal>{s.hero.eyebrow}{parent && <span class="shero__parent">· {parent.name}</span>}</p>
+          <h1 data-reveal style="--d:1" set:html={emph(s.hero.title)} />
+          <p class="lead" data-reveal style="--d:2">{s.hero.lead}</p>
+          <div class="btn-row" data-reveal style="--d:3">
+            <Button href="/contacto/" variant="green">Hablemos de tu proyecto</Button>
+            <Button href="#que-hacemos" variant="ghost">Qué incluye</Button>
+          </div>
+        </div>
+        <div class="shero__art" data-reveal="scale" style="--d:2">
+          <div class="shero__disc" aria-hidden="true"></div>
+          <Image src={s.image} alt={s.imageAlt} widths={[360, 560, 800]} sizes="(min-width: 1024px) 34vw, 70vw" loading="eager" fetchpriority="high" class="float" />
+          <span class="shero__stage mono" aria-hidden="true">{s.stage}</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARA QUIÉN -->
+  <section class="section section--tight foryou">
+    <div class="container foryou__grid">
+      <div data-reveal>
+        <p class="eyebrow">Para quién es</p>
+        <h2 class="h3 foryou__title">Esto es para ti <em>si...</em></h2>
+      </div>
+      <ul role="list" class="foryou__list">
+        {s.forYou.map((f, i) => (
+          <li data-reveal style={`--d:${i}`}>
+            <span class="foryou__mark"><Icon name="check" size={16} /></span>
+            {f}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- QUÉ HACEMOS -->
+  <section class="section section--sand deliver" id="que-hacemos">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Qué hacemos</p>
+          <h2>Lo que incluye <em>{plain(s.name).toLowerCase()}</em></h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">Elegimos contigo las piezas que tu negocio necesita ahora. Ni una más.</p>
+      </div>
+      <ol role="list" class="deliver__grid">
+        {s.deliverables.map((d, i) => (
+          <li class="deliver__item" data-reveal style={`--d:${i % 3}`}>
+            <span class="deliver__num mono">{pad(i + 1)}</span>
+            <h3>{d.title}</h3>
+            <p>{d.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  {children.length > 0 && (
+    <section class="section section--tight specials">
+      <div class="container">
+        <div class="section-head" data-reveal>
+          <p class="eyebrow">Especialidades</p>
+          <h2 class="h3">Dentro de {s.name.toLowerCase()}</h2>
+        </div>
+        <ul role="list" class="specials__list">
+          {children.map((c) => (
+            <li data-reveal>
+              <a href={serviceHref(c)} class="special">
+                <Image src={c.image} alt="" width={240} height={240} class="special__img" loading="lazy" />
+                <span class="special__body">
+                  <span class="special__name">{c.name}</span>
+                  <span class="special__text">{c.card.text}</span>
+                </span>
+                <span class="special__arrow"><Icon name="arrow" size={20} /></span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  <!-- QUÉ CAMBIA -->
+  <section class="section section--dark outcomes">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Qué cambia</p>
+          <h2>Lo que notas <em>en tu día a día</em>.</h2>
+        </div>
+      </div>
+      <ul role="list" class="outcomes__grid">
+        {s.outcomes.map((o, i) => (
+          <li class="outcomes__item" data-reveal style={`--d:${i}`}>
+            <span class="outcomes__icon" aria-hidden="true"><Icon name="arrow-up-right" size={22} /></span>
+            <h3>{o.title}</h3>
+            <p>{o.text}</p>
+          </li>
+        ))}
+      </ul>
+
+      {s.calculator && (
+        <div class="outcomes__calc">
+          <div class="section-head section-head--split">
+            <div data-reveal>
+              <p class="eyebrow">Haz la cuenta</p>
+              <h2 class="h3">¿Cuánto te cuesta hacerlo <em>a mano</em>?</h2>
+            </div>
+          </div>
+          <div data-reveal><HoursCalculator /></div>
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- PROCESO -->
+  <section class="section process">
+    <div class="container process__grid">
+      <div class="process__head" data-reveal>
+        <p class="eyebrow">Cómo lo hacemos</p>
+        <h2 class="h2">Paso a paso, <em>sin sorpresas</em>.</h2>
+        <p class="lead">Sabrás en todo momento en qué fase estamos, qué decisiones necesitamos de ti y qué vas a recibir.</p>
+      </div>
+      <ol role="list" class="process__list">
+        {s.process.map((p, i) => (
+          <li class="process__step" data-reveal style={`--d:${i}`}>
+            <span class="process__num">{pad(i + 1)}</span>
+            <div>
+              <h3>{p.title}</h3>
+              <p>{p.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <Faq items={s.faqs} />
+
+  {(siblings.length > 0 || related.length > 0) && (
+    <section class="section section--sand related">
+      <div class="container">
+        <div class="section-head section-head--split">
+          <div data-reveal>
+            <p class="eyebrow">Encaja con</p>
+            <h2 class="h3">Servicios que <em>suman</em> con este</h2>
+          </div>
+          {parent && (
+            <p data-reveal><a href={serviceHref(parent)} class="link back"><Icon name="arrow-left" size={16} /> Volver a {parent.name}</a></p>
+          )}
+        </div>
+        <div class="related__grid">
+          {[...siblings, ...related].slice(0, 3).map((r, i) => <ServiceCard service={r} index={i} />)}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  /* HERO */
+  .shero {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .shero__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: center;
+    margin-top: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+  .shero__copy {
+    display: grid;
+    gap: 1.75rem;
+    justify-items: start;
+  }
+  .shero__copy h1 {
+    font-size: clamp(2.625rem, 1.4rem + 4.6vw, 6rem);
+    max-width: 14ch;
+  }
+  .shero__parent {
+    color: var(--muted);
+    opacity: 0.8;
+  }
+  .shero__art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: min(100%, 30rem);
+    justify-self: center;
+    aspect-ratio: 1;
+  }
+  .shero__disc {
+    position: absolute;
+    inset: 6%;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: inset 0 0 0 1px var(--line);
+  }
+  .shero__disc::after {
+    content: '';
+    position: absolute;
+    inset: -8%;
+    border-radius: 50%;
+    border: 1px dashed var(--line-strong);
+    animation: spin 60s linear infinite;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  .shero__art :global(img) {
+    position: relative;
+    width: 68%;
+    max-height: 78%;
+    object-fit: contain;
+    filter: drop-shadow(0 30px 30px rgb(20 23 20 / 0.12));
+  }
+  .shero__stage {
+    position: absolute;
+    right: 4%;
+    top: 10%;
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--green);
+    text-transform: uppercase;
+    font-size: 0.6875rem;
+  }
+  @media (min-width: 1024px) {
+    .shero__grid {
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 4rem;
+    }
+  }
+
+  /* PARA QUIÉN */
+  .foryou {
+    border-top: 1px solid var(--line);
+  }
+  .foryou__grid {
+    display: grid;
+    gap: 2rem;
+  }
+  .foryou__title {
+    margin-top: 1rem;
+    font-size: var(--fs-xl);
+  }
+  .foryou__list {
+    display: grid;
+    gap: 0;
+  }
+  .foryou__list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+    align-items: start;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--fs-md);
+    line-height: 1.4;
+    letter-spacing: -0.01em;
+  }
+  .foryou__mark {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 50%;
+    background: var(--green);
+    margin-top: 0.05rem;
+  }
+  @media (min-width: 900px) {
+    .foryou__grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 5rem;
+    }
+  }
+
+  /* QUÉ HACEMOS */
+  .deliver__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  .deliver__item {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 2rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 1px 0 var(--line);
+    transition: transform 0.5s var(--ease), box-shadow 0.5s var(--ease);
+  }
+  .deliver__item:hover {
+    box-shadow: 0 24px 50px -28px rgb(20 23 20 / 0.35);
+  }
+  .deliver__num {
+    color: var(--green-ink);
+    font-weight: 600;
+  }
+  .deliver__item h3 {
+    font-size: 1.375rem;
+  }
+  .deliver__item p {
+    color: var(--muted);
+    font-size: 0.96875rem;
+  }
+  @media (min-width: 700px) {
+    .deliver__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .deliver__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+    .deliver__item {
+      min-height: 15rem;
+    }
+  }
+
+  /* ESPECIALIDADES */
+  .specials__list {
+    display: grid;
+    gap: 1rem;
+  }
+  .special {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+    padding: 1.25rem 1.75rem 1.25rem 1.25rem;
+    border-radius: var(--radius-lg);
+    background: var(--ink);
+    color: var(--paper);
+    transition: transform 0.5s var(--ease);
+  }
+  .special:hover {
+    transform: translateY(-3px);
+  }
+  .special__img {
+    width: clamp(5rem, 4rem + 4vw, 8rem);
+    height: auto;
+    aspect-ratio: 1;
+    object-fit: contain;
+    background: var(--paper);
+    border-radius: var(--radius);
+    padding: 0.75rem;
+  }
+  .special__name {
+    display: block;
+    font-size: var(--fs-lg);
+    font-weight: 560;
+    letter-spacing: -0.03em;
+    margin-bottom: 0.3rem;
+  }
+  .special__text {
+    display: block;
+    color: rgb(242 239 233 / 0.65);
+    max-width: 52ch;
+  }
+  .special__arrow {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--ink);
+    transition: transform 0.5s var(--ease-spring);
+  }
+  .special:hover .special__arrow {
+    transform: translateX(4px);
+  }
+  @media (max-width: 600px) {
+    .special {
+      grid-template-columns: auto 1fr;
+    }
+    .special__arrow {
+      display: none;
+    }
+  }
+
+  /* QUÉ CAMBIA */
+  .outcomes__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  .outcomes__item {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 2rem;
+    border-radius: var(--radius);
+    background: rgb(242 239 233 / 0.05);
+    box-shadow: inset 0 0 0 1px rgb(242 239 233 / 0.08);
+  }
+  .outcomes__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--ink);
+  }
+  .outcomes__item h3 {
+    font-size: var(--fs-lg);
+  }
+  .outcomes__item p {
+    color: var(--muted);
+  }
+  .outcomes__calc {
+    margin-top: var(--section);
+    padding-top: var(--section);
+    border-top: 1px solid var(--line);
+  }
+  .outcomes__calc .section-head {
+    margin-bottom: 2.5rem;
+  }
+  .outcomes__calc h2 {
+    font-size: var(--fs-xl);
+  }
+  @media (min-width: 900px) {
+    .outcomes__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+  }
+
+  /* PROCESO */
+  .process__grid {
+    display: grid;
+    gap: 3rem;
+  }
+  .process__head {
+    display: grid;
+    gap: 1.5rem;
+    align-content: start;
+  }
+  .process__head h2 {
+    font-size: var(--fs-xl);
+  }
+  .process__list {
+    position: relative;
+  }
+  .process__step {
+    position: relative;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.5rem;
+    padding-bottom: 2.5rem;
+  }
+  .process__step::before {
+    content: '';
+    position: absolute;
+    left: 1.75rem;
+    top: 3.5rem;
+    bottom: 0;
+    width: 1px;
+    background: var(--line-strong);
+  }
+  .process__step:last-child::before {
+    display: none;
+  }
+  .process__num {
+    display: grid;
+    place-items: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    background: var(--white);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-family: var(--font-mono);
+    font-size: 0.875rem;
+    font-weight: 600;
+    transition: background-color 0.3s;
+  }
+  .process__step:hover .process__num {
+    background: var(--green);
+    box-shadow: none;
+  }
+  .process__step h3 {
+    font-size: 1.5rem;
+    margin: 0.75rem 0 0.4rem;
+  }
+  .process__step p {
+    color: var(--muted);
+    max-width: 48ch;
+  }
+  @media (min-width: 900px) {
+    .process__grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 5rem;
+    }
+    .process__head {
+      position: sticky;
+      top: 7rem;
+    }
+  }
+
+  /* RELACIONADOS */
+  .related__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  .back {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 550;
+  }
+  @media (min-width: 700px) {
+    .related__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .related__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+  }
+</style>

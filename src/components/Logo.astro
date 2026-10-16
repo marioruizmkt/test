@@ -1,0 +1,33 @@
+---
+import logoLight from '@/assets/brand/logo-claro.svg?raw';
+import logoDark from '@/assets/brand/logo-oscuro.svg?raw';
+
+interface Props {
+  variant?: 'light' | 'dark';
+  class?: string;
+}
+const { variant = 'light', class: className } = Astro.props;
+
+// SVG en línea: nítido a cualquier tamaño y sin petición extra. Se eliminan las dimensiones fijas
+// y se hacen únicos los ids del clipPath para poder usar ambas versiones en la misma página.
+const prepare = (svg: string, id: string) =>
+  svg
+    .replace(/\swidth="\d+"\s+height="\d+"/, ' role="img" aria-label="Globalízame"')
+    .replaceAll('clip0_9_2223', `${id}`)
+    .replaceAll('clip0_9_1716', `${id}`);
+
+const svg = variant === 'light' ? prepare(logoLight, 'logo-clip-l') : prepare(logoDark, 'logo-clip-d');
+---
+
+<span class:list={['logo', className]} set:html={svg} />
+
+<style>
+  .logo {
+    display: inline-block;
+    line-height: 0;
+  }
+  .logo :global(svg) {
+    width: 100%;
+    height: auto;
+  }
+</style>

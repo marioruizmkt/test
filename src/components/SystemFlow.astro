@@ -1,0 +1,169 @@
+---
+import { services, serviceHref, type Stage } from '@/data/services';
+
+const stages: { stage: Stage; verb: string; text: string }[] = [
+  { stage: 'Atraer', verb: 'Atraer', text: 'Que te encuentre quien ya te está buscando, y que te recuerde quien aún no.' },
+  { stage: 'Convertir', verb: 'Convertir', text: 'Que cada visita entienda qué haces, confíe en ti y dé el paso.' },
+  { stage: 'Automatizar', verb: 'Automatizar', text: 'Que el seguimiento, los datos y lo repetitivo pasen sin ti.' },
+  { stage: 'Escalar', verb: 'Escalar', text: 'Que tus procesos vivan en herramientas propias, no en tu cabeza.' },
+];
+const byStage = (st: Stage) => services.filter((s) => s.stage === st && !s.parent);
+const consultoria = services.find((s) => s.stage === 'Dirigir')!;
+---
+
+<div class="flow">
+  <ol role="list" class="flow__list">
+    {stages.map((st, i) => (
+      <li class="flow__step" data-reveal style={`--d:${i}`}>
+        <span class="flow__node" aria-hidden="true"><span></span></span>
+        <span class="flow__num mono">0{i + 1}</span>
+        <h3 class="flow__verb">{st.verb}</h3>
+        <p class="flow__text">{st.text}</p>
+        <ul role="list" class="flow__links">
+          {byStage(st.stage).map((s) => (
+            <li><a href={serviceHref(s)} class="chip">{s.navLabel}</a></li>
+          ))}
+        </ul>
+      </li>
+    ))}
+  </ol>
+  <div class="flow__frame" data-reveal>
+    <span class="flow__num mono">Y por encima de todo</span>
+    <p><strong>Rumbo.</strong> La <a href={serviceHref(consultoria)} class="link">consultoría</a> decide qué pieza toca primero y cuál puede esperar. Así cada euro empuja en la misma dirección.</p>
+  </div>
+</div>
+
+<style>
+  .flow__list {
+    position: relative;
+    display: grid;
+    gap: 0;
+  }
+  .flow__step {
+    position: relative;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 0 0 2.75rem 3.25rem;
+  }
+  /* Línea conductora (vertical en móvil) */
+  .flow__step::before {
+    content: '';
+    position: absolute;
+    left: 0.7rem;
+    top: 0.5rem;
+    bottom: -0.5rem;
+    width: 1px;
+    background: rgb(242 239 233 / 0.18);
+  }
+  .flow__step:last-child::before {
+    background: linear-gradient(rgb(242 239 233 / 0.18), transparent);
+  }
+  .flow__node {
+    position: absolute;
+    left: 0;
+    top: 0.1rem;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 50%;
+    background: var(--ink);
+    box-shadow: inset 0 0 0 1px rgb(242 239 233 / 0.35);
+    display: grid;
+    place-items: center;
+  }
+  .flow__node span {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 0 rgb(134 202 40 / 0.6);
+    animation: pulse 2.4s infinite;
+    animation-delay: calc(var(--d) * 0.6s);
+  }
+  @keyframes pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgb(134 202 40 / 0.55);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgb(134 202 40 / 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgb(134 202 40 / 0);
+    }
+  }
+  .flow__num {
+    color: var(--green);
+    text-transform: uppercase;
+  }
+  .flow__verb {
+    font-size: var(--fs-xl);
+    letter-spacing: -0.04em;
+  }
+  .flow__text {
+    color: var(--muted);
+    max-width: 30ch;
+  }
+  .flow__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .flow__links .chip {
+    transition: background-color 0.25s, color 0.25s, border-color 0.25s;
+  }
+  .flow__links .chip:hover {
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--ink);
+  }
+  .flow__frame {
+    margin-top: 1.5rem;
+    padding: 1.75rem;
+    border-radius: var(--radius);
+    border: 1px dashed rgb(242 239 233 / 0.25);
+    display: grid;
+    gap: 0.6rem;
+  }
+  .flow__frame p {
+    font-size: var(--fs-md);
+    line-height: 1.45;
+    color: rgb(242 239 233 / 0.8);
+    max-width: 60ch;
+  }
+  .flow__frame strong {
+    color: var(--paper);
+    font-weight: 600;
+  }
+
+  @media (min-width: 900px) {
+    .flow__list {
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
+    }
+    .flow__step {
+      padding: 3rem 0 0;
+    }
+    .flow__step::before {
+      left: 0.7rem;
+      right: -2rem;
+      top: 0.7rem;
+      bottom: auto;
+      width: auto;
+      height: 1px;
+      background: rgb(242 239 233 / 0.18);
+    }
+    .flow__step:last-child::before {
+      background: linear-gradient(to right, rgb(242 239 233 / 0.18), transparent);
+    }
+    .flow__node {
+      top: 0;
+    }
+    .flow__frame {
+      margin-top: 3.5rem;
+      grid-template-columns: 14rem 1fr;
+      align-items: baseline;
+      padding: 2rem 2.25rem;
+    }
+  }
+</style>

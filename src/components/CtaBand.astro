@@ -1,0 +1,103 @@
+---
+import { Image } from 'astro:assets';
+import Button from './Button.astro';
+import { emph } from '@/lib/text';
+import { site } from '@/data/site';
+import bubble from '@/assets/3d/contacto-burbuja.png';
+
+interface Props {
+  title?: string;
+  text?: string;
+}
+const {
+  title = '¿Hablamos de *tu negocio*?',
+  text = 'Cuéntanos qué te quita tiempo o qué quieres conseguir. Te respondemos con una primera valoración honesta, aunque la respuesta sea que no nos necesitas.',
+} = Astro.props;
+---
+
+<section class="cta-band">
+  <div class="container">
+    <div class="cta-band__card" data-reveal="scale">
+      <div class="cta-band__copy">
+        <p class="eyebrow">Siguiente paso</p>
+        <h2 set:html={emph(title)} />
+        <p class="cta-band__text">{text}</p>
+        <div class="btn-row">
+          <Button href="/contacto/" variant="green">Cuéntanos tu caso</Button>
+          <Button href={site.whatsapp} variant="ghost">Escríbenos por WhatsApp</Button>
+        </div>
+      </div>
+      <div class="cta-band__art" aria-hidden="true">
+        <Image src={bubble} alt="" widths={[320, 520]} sizes="(min-width: 900px) 26vw, 50vw" class="float float--slow" loading="lazy" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    padding-bottom: calc(var(--section) * 0.75);
+    padding-top: calc(var(--section) * 0.4);
+  }
+  .cta-band__card {
+    position: relative;
+    display: grid;
+    gap: 2rem;
+    padding: clamp(2rem, 1.5rem + 3vw, 4.5rem);
+    background: var(--green);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .cta-band__card::before {
+    content: '';
+    position: absolute;
+    inset: auto -10% -60% auto;
+    width: 60%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    border: 1px solid rgb(20 23 20 / 0.15);
+    box-shadow:
+      0 0 0 3rem rgb(255 255 255 / 0.06),
+      0 0 0 6rem rgb(255 255 255 / 0.04);
+  }
+  .cta-band__copy {
+    position: relative;
+    display: grid;
+    gap: 1.5rem;
+    max-width: 40rem;
+  }
+  .cta-band .eyebrow {
+    color: var(--ink);
+  }
+  .cta-band .eyebrow::before {
+    background: var(--ink);
+    box-shadow: none;
+  }
+  .cta-band h2 {
+    font-size: var(--fs-2xl);
+  }
+  .cta-band__text {
+    font-size: var(--fs-md);
+    line-height: 1.5;
+    max-width: 34ch;
+  }
+  .cta-band :global(.btn--ghost) {
+    box-shadow: inset 0 0 0 1px rgb(20 23 20 / 0.35);
+  }
+  .cta-band__art {
+    position: relative;
+    justify-self: end;
+    width: min(16rem, 55%);
+    margin: -1rem -0.5rem -1rem 0;
+  }
+  @media (min-width: 900px) {
+    .cta-band__card {
+      grid-template-columns: 1fr auto;
+      align-items: center;
+    }
+    .cta-band__art {
+      width: clamp(16rem, 24vw, 22rem);
+      margin: -2rem 0;
+    }
+  }
+</style>

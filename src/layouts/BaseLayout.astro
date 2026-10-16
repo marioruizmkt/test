@@ -1,0 +1,132 @@
+---
+import '@/styles/global.css';
+import Header from '@/components/Header.astro';
+import Footer from '@/components/Footer.astro';
+import CookieBanner from '@/components/CookieBanner.astro';
+import { site } from '@/data/site';
+
+export interface Crumb {
+  label: string;
+  href: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  /** Ruta de la imagen social dentro de /public. */
+  ogImage?: string;
+  noindex?: boolean;
+  /** Bloques JSON-LD adicionales de la página. */
+  schema?: Record<string, unknown>[];
+  /** Migas de pan (sin incluir Inicio): generan BreadcrumbList. */
+  breadcrumbs?: Crumb[];
+}
+
+const { title, description, ogImage = '/og/default.png', noindex = false, schema = [], breadcrumbs } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, site.url).href;
+const fullTitle = Astro.url.pathname === '/' ? `${site.name} · ${title}` : `${title} · ${site.name}`;
+const ogUrl = new URL(ogImage, site.url).href;
+
+const orgId = `${site.url}/#organizacion`;
+const baseSchema: Record<string, unknown>[] = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ProfessionalService',
+    '@id': orgId,
+    name: site.name,
+    url: site.url,
+    logo: `${site.url}/logo.svg`,
+    image: `${site.url}/og/default.png`,
+    description: site.description,
+    email: site.email,
+    telephone: site.phone,
+    slogan: site.tagline,
+    areaServed: { '@type': 'Country', name: 'España' },
+    knowsLanguage: 'es',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${site.url}/#web`,
+    url: site.url,
+    name: site.name,
+    inLanguage: 'es-ES',
+    publisher: { '@id': orgId },
+  },
+];
+if (breadcrumbs?.length) {
+  baseSchema.push({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [{ label: 'Inicio', href: '/' }, ...breadcrumbs].map((c, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      name: c.label,
+      item: new URL(c.href, site.url).href,
+    })),
+  });
+}
+const allSchema = [...baseSchema, ...schema];
+---
+
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex, follow" />}
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/site.webmanifest" />
+    <meta name="theme-color" content="#F2EFE9" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <script is:inline>
+      document.documentElement.classList.replace('no-js', 'js');
+    </script>
+
+    {allSchema.map((s) => <script type="application/ld+json" set:html={JSON.stringify(s)} />)}
+
+    <!--
+      Scripts que requieren consentimiento (analítica, píxeles...): declararlos aquí con
+      type="text/plain" y data-consent="analytics" | "marketing". Ver CookieBanner.astro.
+    -->
+    <slot name="head" />
+  </head>
+  <body class="grain">
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <Header />
+    <main id="contenido">
+      <slot />
+    </main>
+    <Footer />
+    <CookieBanner />
+
+    <script>
+      import '@/scripts/reveal';
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  html.no-scroll {
+    overflow: hidden;
+  }
+</style>

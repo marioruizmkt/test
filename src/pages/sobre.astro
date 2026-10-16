@@ -1,0 +1,377 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { topServices } from '@/data/services';
+import nivel from '@/assets/3d/sobre-nivel.png';
+
+const breadcrumbs = [{ label: 'Sobre nosotros', href: '/sobre/' }];
+
+const principles = [
+  { title: 'El negocio antes que la tecnología', text: 'No empezamos por la herramienta de moda. Empezamos por tus números, tus clientes y tu día a día. La tecnología viene después, y solo si suma.' },
+  { title: 'Sistemas, no parches', text: 'Cada pieza que construimos está pensada para conectarse con las demás. Lo que hacemos hoy tiene que facilitar lo que harás mañana.' },
+  { title: 'Claridad radical', text: 'Presupuestos cerrados, fases claras y explicaciones sin jerga. Si no entiendes lo que estás pagando, hemos fallado nosotros.' },
+  { title: 'Tu autonomía es el objetivo', text: 'Documentamos, formamos y dejamos todo a tu nombre. Queremos que sigas con nosotros porque aportamos, no porque dependas.' },
+  { title: 'Medir para decidir', text: 'Lo que no se mide se discute. Definimos desde el principio qué significa que algo funcione y lo revisamos con datos.' },
+];
+
+const nots = [
+  'Webs de plantilla con tu logo encima.',
+  'Contratos con permanencia para retenerte.',
+  'Informes llenos de métricas que no significan nada.',
+  'Venderte inteligencia artificial si no la necesitas.',
+  'Proyectos eternos sin entregas visibles.',
+  'Quedarnos con tu dominio, tu código o tus cuentas.',
+];
+
+const howWeWork = [
+  { icon: 'spark', title: 'Un equipo, un interlocutor', text: 'Estrategia, diseño, desarrollo y automatización bajo el mismo techo. Hablas con una persona que conoce tu proyecto entero.' },
+  { icon: 'clock', title: 'Ritmo de pyme', text: 'Fases cortas, entregas frecuentes y decisiones rápidas. Sin comités ni presentaciones eternas.' },
+  { icon: 'check', title: 'Todo documentado', text: 'Accesos, procesos y decisiones quedan por escrito y a tu nombre. Nada vive solo en nuestra cabeza.' },
+] as const;
+---
+
+<BaseLayout
+  title="Sobre nosotros"
+  description="Somos Globalízame, una agencia digital para pymes. Construimos sistemas digitales para que tu negocio venda más y dependa menos de ti."
+  breadcrumbs={breadcrumbs}
+>
+  <section class="ahero">
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+      <div class="ahero__grid">
+        <div class="ahero__copy">
+          <p class="eyebrow" data-reveal>Sobre nosotros</p>
+          <h1 data-reveal style="--d:1">El equipo digital que tu pyme <em>no tiene en plantilla</em>.</h1>
+          <p class="lead" data-reveal style="--d:2">
+            Somos una agencia digital pensada para pymes. Unimos estrategia, diseño, marketing, automatización e inteligencia artificial para construir algo que pocas empresas pequeñas tienen: un negocio que funciona aunque tú no estés mirando.
+          </p>
+        </div>
+        <div class="ahero__workshop" aria-hidden="true">
+          {topServices.map((s, i) => (
+            <div class="ahero__obj" style={`--i:${i}`} data-reveal="scale">
+              <Image src={s.image} alt="" width={220} height={220} loading="eager" class="float" style={`animation-delay:${-i * 1.3}s`} />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NOMBRE -->
+  <section class="section section--dark name rounded-top">
+    <div class="container name__grid">
+      <p class="eyebrow" data-reveal>Por qué Globalízame</p>
+      <div>
+        <p class="name__big" data-reveal>
+          <em>Globalízame</em> no va de abrir oficina en el extranjero. Va de que tu negocio llegue <span class="name__hl">más lejos</span>: a más clientes, a más mercado y a más horas libres para ti, sin que tengas que estar en todas partes.
+        </p>
+        <p class="name__small" data-reveal style="--d:1">
+          Lo hacemos con sistemas: piezas digitales conectadas que captan, atienden, ordenan y venden por ti. Tú decides hasta dónde quieres llegar. Nosotros construimos el camino.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRINCIPIOS -->
+  <section class="section principles">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Cómo pensamos</p>
+          <h2>Cinco principios que <em>no negociamos</em>.</h2>
+        </div>
+        <div class="principles__art" data-reveal="scale">
+          <Image src={nivel} alt="Nivel de burbuja con la burbuja verde perfectamente centrada" widths={[320, 520]} sizes="(min-width: 900px) 24vw, 60vw" loading="lazy" class="float float--slow" />
+        </div>
+      </div>
+      <ol role="list" class="principles__list">
+        {principles.map((p, i) => (
+          <li class="principles__item" data-reveal>
+            <span class="principles__num">{i + 1}</span>
+            <h3>{p.title}</h3>
+            <p>{p.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- LO QUE NO HACEMOS -->
+  <section class="section section--sand nots">
+    <div class="container nots__grid">
+      <div data-reveal>
+        <p class="eyebrow">Para que quede claro</p>
+        <h2 class="nots__title">Lo que <em>no</em> vas a encontrar aquí.</h2>
+      </div>
+      <ul role="list" class="nots__list">
+        {nots.map((n, i) => (
+          <li data-reveal style={`--d:${i % 3}`}>
+            <span class="nots__x"><Icon name="close" size={16} /></span>
+            <span>{n}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- CÓMO TRABAJAMOS -->
+  <section class="section how">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Trabajar juntos</p>
+          <h2>Cerca, claro y <em>a tu ritmo</em>.</h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">Trabajamos en remoto con negocios de toda España y nos adaptamos a cómo te organizas tú.</p>
+      </div>
+      <ul role="list" class="how__grid">
+        {howWeWork.map((h, i) => (
+          <li class="how__item" data-reveal style={`--d:${i}`}>
+            <span class="how__icon"><Icon name={h.icon} size={22} /></span>
+            <h3>{h.title}</h3>
+            <p>{h.text}</p>
+          </li>
+        ))}
+      </ul>
+      <div class="how__cta" data-reveal>
+        <Button href="/servicios/" variant="ghost">Ver qué hacemos</Button>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="¿Te encaja cómo *trabajamos*?" />
+</BaseLayout>
+
+<style>
+  .ahero {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: calc(var(--section) * 0.8);
+    overflow: hidden;
+  }
+  .ahero__grid {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+    margin-top: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+  .ahero__copy {
+    display: grid;
+    gap: 1.75rem;
+  }
+  .ahero__copy h1 {
+    font-size: clamp(2.625rem, 1.4rem + 4.6vw, 6rem);
+    max-width: 14ch;
+  }
+  .ahero__copy .lead {
+    max-width: 40ch;
+  }
+  .ahero__workshop {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+  }
+  .ahero__obj {
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 1px 0 var(--line);
+    padding: 14%;
+  }
+  .ahero__obj:nth-child(2),
+  .ahero__obj:nth-child(6) {
+    background: var(--paper-3);
+  }
+  .ahero__obj:nth-child(4) {
+    background: var(--green);
+  }
+  .ahero__obj :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+  @media (min-width: 1024px) {
+    .ahero__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 4rem;
+    }
+    .ahero__obj:nth-child(3n + 2) {
+      transform: translateY(1.5rem);
+    }
+    .js .ahero__obj:nth-child(3n + 2)[data-reveal].is-in {
+      transform: translateY(1.5rem);
+    }
+  }
+
+  .name__grid {
+    display: grid;
+    gap: 2rem;
+    align-items: start;
+  }
+  .name__grid > .eyebrow {
+    margin-top: 1rem;
+  }
+  .name__big {
+    font-size: clamp(1.75rem, 1.2rem + 2.4vw, 3.5rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.12;
+    max-width: 26ch;
+  }
+  .name__big em {
+    color: var(--green);
+  }
+  .name__hl {
+    background: var(--green);
+    color: var(--ink);
+    padding: 0 0.15em;
+    border-radius: 0.15em;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+  .name__small {
+    margin-top: 2.5rem;
+    font-size: var(--fs-md);
+    line-height: 1.5;
+    color: var(--muted);
+    max-width: 48ch;
+  }
+  @media (min-width: 900px) {
+    .name__grid {
+      grid-template-columns: 0.3fr 1fr;
+      gap: 4rem;
+    }
+  }
+
+  .principles__art {
+    justify-self: end;
+    width: min(18rem, 60%);
+  }
+  .principles__list {
+    border-top: 1px solid var(--line-strong);
+  }
+  .principles__item {
+    display: grid;
+    grid-template-columns: 3rem 1fr;
+    gap: 0.5rem 1.5rem;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .principles__num {
+    grid-row: span 2;
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 2.75rem;
+    line-height: 1;
+    color: var(--green-ink);
+  }
+  .principles__item h3 {
+    font-size: var(--fs-lg);
+  }
+  .principles__item p {
+    color: var(--muted);
+    max-width: 58ch;
+  }
+  @media (min-width: 900px) {
+    .principles__item {
+      grid-template-columns: 5rem 1fr 1fr;
+      align-items: baseline;
+      gap: 2rem;
+      padding: 2.5rem 0;
+    }
+    .principles__num {
+      grid-row: auto;
+    }
+  }
+
+  .nots__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .nots__title {
+    margin-top: 1rem;
+    font-size: var(--fs-xl);
+  }
+  .nots__list {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .nots__list li {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.01em;
+  }
+  .nots__list li > span:last-child {
+    text-decoration: line-through;
+    text-decoration-color: rgb(20 23 20 / 0.35);
+    text-decoration-thickness: 1px;
+  }
+  .nots__x {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  @media (min-width: 900px) {
+    .nots__grid {
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 5rem;
+    }
+    .nots__list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .how__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  .how__item {
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    padding: 2rem;
+    border-radius: var(--radius);
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .how__icon {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    margin-bottom: 1rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--green);
+  }
+  .how__item h3 {
+    font-size: 1.5rem;
+  }
+  .how__item p {
+    color: var(--muted);
+  }
+  .how__cta {
+    margin-top: 2.5rem;
+  }
+  @media (min-width: 900px) {
+    .how__grid {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+    }
+  }
+</style>

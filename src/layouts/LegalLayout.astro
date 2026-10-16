@@ -1,0 +1,113 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import { site } from '@/data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  intro: string;
+  toc: { id: string; label: string }[];
+}
+const { title, description, path, intro, toc } = Astro.props;
+const breadcrumbs = [{ label: title, href: path }];
+---
+
+<BaseLayout title={title} description={description} breadcrumbs={breadcrumbs}>
+  <section class="legal">
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+      <header class="legal__head">
+        <p class="eyebrow">Legal</p>
+        <h1>{title}</h1>
+        <p class="lead">{intro}</p>
+        <p class="legal__date mono">Última actualización: {site.legal.lastUpdated}</p>
+      </header>
+      <div class="legal__grid">
+        <nav class="legal__toc" aria-label="Índice">
+          <p class="legal__toc-title mono">En esta página</p>
+          <ol role="list">
+            {toc.map((t) => <li><a href={`#${t.id}`}>{t.label}</a></li>)}
+          </ol>
+        </nav>
+        <article class="prose">
+          <slot />
+        </article>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: var(--section);
+  }
+  .legal__head {
+    display: grid;
+    gap: 1.5rem;
+    margin: clamp(2rem, 1rem + 3vw, 4rem) 0 clamp(3rem, 2rem + 3vw, 5rem);
+    padding-bottom: clamp(2rem, 1rem + 3vw, 3.5rem);
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .legal__head h1 {
+    font-size: var(--fs-2xl);
+  }
+  .legal__head .lead {
+    max-width: 52ch;
+  }
+  .legal__date {
+    color: var(--muted);
+  }
+  .legal__grid {
+    display: grid;
+    gap: 2.5rem;
+  }
+  .legal__toc-title {
+    color: var(--muted);
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .legal__toc ol {
+    display: grid;
+    gap: 0.5rem;
+    font-size: 0.9375rem;
+    counter-reset: toc;
+  }
+  .legal__toc li {
+    counter-increment: toc;
+  }
+  .legal__toc a {
+    display: flex;
+    gap: 0.6rem;
+    color: var(--muted);
+    transition: color 0.2s;
+  }
+  .legal__toc a::before {
+    content: counter(toc, decimal-leading-zero);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    padding-top: 0.2rem;
+    color: var(--green-ink);
+  }
+  .legal__toc a:hover {
+    color: var(--ink);
+  }
+  .prose :global(h2:first-child) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+  @media (min-width: 1024px) {
+    .legal__grid {
+      grid-template-columns: 16rem 1fr;
+      gap: 5rem;
+    }
+    .legal__toc {
+      position: sticky;
+      top: 7rem;
+      align-self: start;
+    }
+  }
+</style>

@@ -1,0 +1,571 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import Icon from '@/components/Icon.astro';
+import ServiceCard from '@/components/ServiceCard.astro';
+import SystemFlow from '@/components/SystemFlow.astro';
+import HoursCalculator from '@/components/HoursCalculator.astro';
+import Faq from '@/components/Faq.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { topServices } from '@/data/services';
+import { site } from '@/data/site';
+import hero from '@/assets/3d/hero-maquina.png';
+import nivel from '@/assets/3d/sobre-nivel.png';
+
+const symptoms = [
+  { title: 'Si tú no estás, no se vende.', text: 'Los presupuestos, el seguimiento y las respuestas esperan a que tengas un hueco. Y los clientes no esperan.' },
+  { title: 'Tus herramientas no se hablan.', text: 'Web, email, hojas de cálculo y facturación van cada una por su lado. Tú haces de pegamento.' },
+  { title: 'Tu web es un folleto.', text: 'Está ahí, pero no capta, no filtra y no mide. Nadie sabe si trae clientes o solo visitas.' },
+];
+
+const method = [
+  { title: 'Diagnóstico', text: 'Entendemos tu negocio, tus números y dónde se te escapa el tiempo y el dinero.' },
+  { title: 'Plan', text: 'Priorizamos por impacto. Te decimos qué hacer primero, qué puede esperar y qué no necesitas.' },
+  { title: 'Construcción', text: 'Diseñamos, desarrollamos y conectamos las piezas, por fases y con entregas que puedes ver.' },
+  { title: 'Evolución', text: 'Medimos, ajustamos y mejoramos. Un sistema vivo, no un proyecto que se queda en un cajón.' },
+];
+
+const commitments = [
+  { title: 'Hablamos claro', text: 'Sin jerga ni humo. Si algo no tiene sentido para tu negocio, te lo decimos aunque perdamos la venta.' },
+  { title: 'Todo es tuyo', text: 'Dominio, código, cuentas y datos a nombre de tu empresa. Si un día te vas, te lo llevas todo.' },
+  { title: 'Medimos lo que importa', text: 'Clientes, horas y euros. No métricas de vanidad que quedan bonitas en un informe.' },
+  { title: 'Sin permanencias', text: 'Te quedas porque funciona, no porque lo diga un contrato.' },
+];
+
+const faqs = [
+  { q: '¿Trabajáis con pymes de cualquier sector?', a: 'Sí. Trabajamos con pymes de servicios, comercio, industria y profesionales independientes. Lo que tienen en común no es el sector, sino querer crecer sin que todo pase por sus manos.' },
+  { q: '¿Tengo que contratar todos los servicios?', a: 'No. Puedes empezar por una sola pieza, la que más impacto tenga hoy. Lo que sí hacemos es diseñarla pensando en cómo encajará con las siguientes.' },
+  { q: '¿Cuánto cuesta trabajar con vosotros?', a: 'Cada proyecto tiene un presupuesto cerrado según su alcance. Después de una primera conversación te enviamos una propuesta clara, por fases, para que decidas cuánto y a qué ritmo invertir.' },
+  { q: '¿Trabajáis en remoto?', a: 'Sí, trabajamos con negocios de toda España en remoto, con reuniones por videollamada y canales de comunicación directos.' },
+  { q: '¿Qué pasa después de lanzar?', a: 'Podemos seguir contigo midiendo, mejorando y manteniendo, o dejarte todo documentado para que tu equipo continúe. Tú decides.' },
+];
+
+const ticker = ['Webs que convierten', 'SEO', 'Google Ads', 'Meta Ads', 'CRM', 'Automatizaciones', 'Agentes de IA', 'Integraciones', 'Áreas de cliente', 'Software a medida', 'Analítica', 'Email marketing'];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: faqs.map((f) => ({ '@type': 'Question', name: f.q, acceptedAnswer: { '@type': 'Answer', text: f.a } })),
+  },
+];
+---
+
+<BaseLayout title="Agencia digital para pymes" description={site.description} schema={schema}>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero__grid">
+      <div class="hero__copy">
+        <p class="eyebrow" data-reveal>Agencia digital para pymes</p>
+        <h1 class="hero__title" data-reveal style="--d:1">
+          Que tu negocio venda más y dependa <em>menos de ti.</em>
+        </h1>
+        <p class="lead hero__lead" data-reveal style="--d:2">
+          Diseñamos webs, captación, automatizaciones e inteligencia artificial que trabajan juntas, como un sistema. Tu negocio gana tracción. Tú recuperas tiempo.
+        </p>
+        <div class="btn-row" data-reveal style="--d:3">
+          <Button href="/contacto/" variant="green">Cuéntanos tu caso</Button>
+          <Button href="/servicios/" variant="ghost">Ver servicios</Button>
+        </div>
+      </div>
+      <div class="hero__art" data-reveal="scale" style="--d:2">
+        <div class="hero__halo" aria-hidden="true"></div>
+        <Image
+          src={hero}
+          alt="Máquina escultórica de canicas verdes que recorren raíles negros y un globo de alambre: un sistema que funciona solo"
+          widths={[420, 640, 900, 1200]}
+          sizes="(min-width: 1024px) 40vw, 86vw"
+          loading="eager"
+          fetchpriority="high"
+          class="hero__img float float--slow"
+        />
+        <div class="hero__tag hero__tag--a" aria-hidden="true"><span class="dot"></span> Nuevo contacto → CRM</div>
+        <div class="hero__tag hero__tag--b" aria-hidden="true"><Icon name="check" size={14} /> Presupuesto enviado</div>
+        <div class="hero__tag hero__tag--c" aria-hidden="true"><Icon name="clock" size={14} /> 03:12 · Mientras dormías</div>
+      </div>
+    </div>
+
+    <div class="ticker" aria-hidden="true">
+      <div class="ticker__track">
+        {[0, 1].map(() => (
+          <ul role="list">
+            {ticker.map((t) => <li>{t}</li>)}
+          </ul>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROBLEMA -->
+  <section class="section problem">
+    <div class="container">
+      <div class="problem__statement" data-reveal>
+        <p class="eyebrow">El diagnóstico</p>
+        <h2>
+          La mayoría de pymes no tienen un problema de marketing. Tienen un problema de <em>dependencia</em>.
+        </h2>
+      </div>
+      <ol role="list" class="problem__list">
+        {symptoms.map((s, i) => (
+          <li class="problem__item" data-reveal style={`--d:${i}`}>
+            <span class="problem__num mono">0{i + 1}</span>
+            <h3>{s.title}</h3>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- SERVICIOS -->
+  <section class="section section--sand services" id="servicios">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Qué hacemos</p>
+          <h2>Seis piezas. <em>Un mismo</em> objetivo.</h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">
+          Puedes empezar por una sola. Pero todas están pensadas para encajar, compartir datos y empujar en la misma dirección: más ventas con menos esfuerzo.
+        </p>
+      </div>
+      <div class="services__grid">
+        {topServices.map((s, i, all) => <ServiceCard service={s} index={i} size={i < 2 ? 'lg' : 'md'} class={i < 2 ? 'is-wide' : i === all.length - 1 && all.length % 3 === 0 ? 'is-full' : ''} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- SISTEMA -->
+  <section class="section section--dark system">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">El sistema Globalízame</p>
+          <h2>No vendemos piezas sueltas. Construimos <em>un sistema</em>.</h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">
+          Una web bonita que no está conectada a nada es un gasto. Conectada a tu captación, tu CRM y tus procesos, es una máquina de generar negocio.
+        </p>
+      </div>
+      <SystemFlow />
+    </div>
+  </section>
+
+  <!-- CALCULADORA -->
+  <section class="section section--dark calc-section">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Haz la cuenta</p>
+          <h2>¿Cuánto te cuesta hacerlo <em>a mano</em>?</h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">
+          Copiar datos, perseguir respuestas, rehacer el mismo presupuesto. Mueve los controles y mira cuánto tiempo se va en tareas que podría hacer un sistema.
+        </p>
+      </div>
+      <div data-reveal><HoursCalculator /></div>
+    </div>
+  </section>
+
+  <!-- MÉTODO -->
+  <section class="section method">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">Cómo trabajamos</p>
+          <h2>Primero entender. <em>Después</em> construir.</h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">
+          Un método sencillo y transparente. En cada fase sabes qué estamos haciendo, por qué y qué vas a recibir.
+        </p>
+      </div>
+      <ol role="list" class="method__list">
+        {method.map((m, i) => (
+          <li class="method__item" data-reveal style={`--d:${i}`}>
+            <span class="method__num">{i + 1}</span>
+            <div>
+              <h3>{m.title}</h3>
+              <p>{m.text}</p>
+            </div>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- COMPROMISOS -->
+  <section class="section section--sand commitments">
+    <div class="container commitments__grid">
+      <div class="commitments__art" data-reveal="scale">
+        <Image src={nivel} alt="Nivel de burbuja de cerámica negra con la burbuja verde centrada" widths={[360, 560, 800]} sizes="(min-width: 900px) 34vw, 80vw" loading="lazy" class="float float--delay" />
+      </div>
+      <div>
+        <div class="commitments__head" data-reveal>
+          <p class="eyebrow">Lo que puedes esperar</p>
+          <h2>Trabajar con nosotros es <em>sencillo</em>.</h2>
+        </div>
+        <ul role="list" class="commitments__list">
+          {commitments.map((c, i) => (
+            <li data-reveal style={`--d:${i}`}>
+              <span class="commitments__check"><Icon name="check" size={16} /></span>
+              <div>
+                <h3>{c.title}</h3>
+                <p>{c.text}</p>
+              </div>
+            </li>
+          ))}
+        </ul>
+        <div data-reveal><Button href="/sobre/" variant="ghost">Conócenos</Button></div>
+      </div>
+    </div>
+  </section>
+
+  <Faq items={faqs} />
+  <CtaBand />
+</BaseLayout>
+
+<style>
+  /* HERO */
+  .hero {
+    padding-top: clamp(1.5rem, 1rem + 3vw, 4rem);
+    overflow: hidden;
+  }
+  .hero__grid {
+    display: grid;
+    gap: 2.5rem;
+    align-items: center;
+  }
+  .hero__copy {
+    display: grid;
+    gap: 1.75rem;
+    justify-items: start;
+  }
+  .hero__title {
+    max-width: 12ch;
+    isolation: isolate;
+  }
+  .hero__title em {
+    color: var(--ink);
+    position: relative;
+    white-space: nowrap;
+  }
+  .hero__title em::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0.1em;
+    bottom: 0.06em;
+    height: 0.14em;
+    background: var(--green);
+    border-radius: 0.1em;
+    z-index: -1;
+    transform-origin: left;
+    animation: underline 1.2s 0.8s var(--ease) both;
+  }
+  @keyframes underline {
+    from {
+      transform: scaleX(0);
+    }
+  }
+  .hero__lead {
+    max-width: 34rem;
+  }
+  .hero__art {
+    position: relative;
+    justify-self: center;
+    width: min(100%, 34rem);
+  }
+  .hero__halo {
+    position: absolute;
+    inset: 12% 6% 4%;
+    border-radius: 50%;
+    background: radial-gradient(closest-side, rgb(134 202 40 / 0.35), rgb(134 202 40 / 0) 70%);
+    filter: blur(20px);
+  }
+  .hero__img {
+    position: relative;
+    width: 82%;
+    margin-inline: auto;
+    filter: drop-shadow(0 40px 40px rgb(20 23 20 / 0.12));
+  }
+  .hero__tag {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.55rem 0.9rem;
+    border-radius: 999px;
+    background: var(--white);
+    box-shadow:
+      0 1px 0 var(--line),
+      0 14px 30px -12px rgb(20 23 20 / 0.25);
+    font-size: 0.8125rem;
+    font-weight: 550;
+    white-space: nowrap;
+    animation: float 6s ease-in-out infinite;
+  }
+  .hero__tag .dot {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 0 3px rgb(134 202 40 / 0.25);
+  }
+  .hero__tag :global(svg) {
+    color: var(--green-ink);
+  }
+  .hero__tag--a {
+    top: 14%;
+    left: -2%;
+  }
+  .hero__tag--b {
+    top: 48%;
+    right: -3%;
+    animation-delay: -2s;
+  }
+  .hero__tag--c {
+    bottom: 10%;
+    left: 4%;
+    background: var(--ink);
+    color: var(--paper);
+    animation-delay: -4s;
+  }
+  .hero__tag--c :global(svg) {
+    color: var(--green);
+  }
+
+  .ticker {
+    margin-top: clamp(3rem, 2rem + 4vw, 6rem);
+    border-block: 1px solid var(--line);
+    overflow: hidden;
+    mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  }
+  .ticker__track {
+    display: flex;
+    width: max-content;
+    animation: ticker 48s linear infinite;
+  }
+  .ticker ul {
+    display: flex;
+    flex-shrink: 0;
+  }
+  .ticker li {
+    display: flex;
+    align-items: center;
+    gap: 2.5rem;
+    padding: 1.25rem 0 1.25rem 2.5rem;
+    font-size: clamp(1.125rem, 1rem + 0.6vw, 1.5rem);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+  }
+  .ticker li::after {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  @keyframes ticker {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @media (min-width: 1024px) {
+    .hero__grid {
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 3rem;
+      min-height: min(78vh, 46rem);
+    }
+    .hero__art {
+      width: 100%;
+    }
+  }
+
+  /* PROBLEMA */
+  .problem__statement {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .problem__statement h2 {
+    font-size: var(--fs-2xl);
+    max-width: 22ch;
+  }
+  .problem__list {
+    display: grid;
+    gap: 1rem;
+  }
+  .problem__item {
+    display: grid;
+    gap: 0.75rem;
+    padding: 2rem 0;
+    border-top: 1px solid var(--line-strong);
+  }
+  .problem__num {
+    color: var(--muted);
+  }
+  .problem__item h3 {
+    font-size: var(--fs-lg);
+  }
+  .problem__item p {
+    color: var(--muted);
+    max-width: 36ch;
+  }
+  @media (min-width: 900px) {
+    .problem__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2.5rem;
+    }
+  }
+
+  /* SERVICIOS */
+  .services__grid {
+    display: grid;
+    gap: 1rem;
+  }
+  @media (min-width: 700px) {
+    .services__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  @media (min-width: 1024px) {
+    .services__grid {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 1.25rem;
+    }
+    .services__grid > :global(*) {
+      grid-column: span 2;
+    }
+    .services__grid > :global(.is-wide) {
+      grid-column: span 3;
+    }
+    .services__grid > :global(.is-full) {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* SISTEMA */
+  .system {
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin-top: -2rem;
+  }
+  .calc-section {
+    padding-top: 0;
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+  }
+  .calc-section .section-head {
+    padding-top: var(--section);
+    border-top: 1px solid var(--line);
+  }
+
+  /* MÉTODO */
+  .method__list {
+    display: grid;
+    gap: 1rem;
+    counter-reset: m;
+  }
+  .method__item {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1.25rem;
+    padding: 1.75rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .method__num {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--green);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.5rem;
+  }
+  .method__item h3 {
+    font-size: 1.375rem;
+    margin-bottom: 0.4rem;
+  }
+  .method__item p {
+    color: var(--muted);
+    font-size: 0.96875rem;
+  }
+  @media (min-width: 900px) {
+    .method__list {
+      grid-template-columns: repeat(4, 1fr);
+    }
+    .method__item {
+      grid-template-columns: 1fr;
+      align-content: start;
+      min-height: 17rem;
+      padding: 2rem;
+    }
+    .method__item:nth-child(even) {
+      transform: translateY(2.5rem);
+    }
+    .js .method__item:nth-child(even)[data-reveal].is-in {
+      transform: translateY(2.5rem);
+    }
+  }
+
+  /* COMPROMISOS */
+  .commitments__grid {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+  .commitments__art {
+    max-width: 30rem;
+    justify-self: center;
+    width: 80%;
+  }
+  .commitments__head {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 2.5rem;
+  }
+  .commitments__head h2 {
+    font-size: var(--fs-xl);
+  }
+  .commitments__list {
+    display: grid;
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+  }
+  .commitments__list li {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+  }
+  .commitments__check {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    background: var(--green);
+    margin-top: 0.1rem;
+  }
+  .commitments__list h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+  .commitments__list p {
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  @media (min-width: 900px) {
+    .commitments__grid {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 5rem;
+    }
+    .commitments__art {
+      width: 100%;
+    }
+  }
+</style>

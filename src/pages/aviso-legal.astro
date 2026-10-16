@@ -1,0 +1,78 @@
+---
+import LegalLayout from '@/layouts/LegalLayout.astro';
+import V from '@/components/LegalValue.astro';
+import { site } from '@/data/site';
+
+const toc = [
+  { id: 'titular', label: 'Datos del titular' },
+  { id: 'objeto', label: 'Objeto' },
+  { id: 'condiciones', label: 'Condiciones de uso' },
+  { id: 'propiedad', label: 'Propiedad intelectual e industrial' },
+  { id: 'responsabilidad', label: 'Responsabilidad' },
+  { id: 'enlaces', label: 'Enlaces' },
+  { id: 'datos', label: 'Protección de datos y cookies' },
+  { id: 'ley', label: 'Legislación y jurisdicción' },
+];
+---
+
+<LegalLayout
+  title="Aviso legal"
+  path="/aviso-legal/"
+  description="Aviso legal del sitio web de Globalízame: datos del titular, condiciones de uso, propiedad intelectual y responsabilidad."
+  intro="Información sobre quién está detrás de esta web y las condiciones para usarla, conforme a la Ley 34/2002 de Servicios de la Sociedad de la Información (LSSI-CE)."
+  toc={toc}
+>
+  <h2 id="titular">Datos del titular</h2>
+  <p>En cumplimiento del artículo 10 de la LSSI-CE, se informa de los datos del titular de este sitio web:</p>
+  <ul>
+    <li><strong>Titular:</strong> <V value={site.legal.owner} /></li>
+    <li><strong>Nombre comercial:</strong> {site.name}</li>
+    <li><strong>NIF/CIF:</strong> <V value={site.legal.taxId} /></li>
+    <li><strong>Domicilio:</strong> <V value={site.legal.address} /></li>
+    <li><strong>Email:</strong> <a href={`mailto:${site.email}`}>{site.email}</a></li>
+    <li><strong>Teléfono:</strong> <a href={site.phoneHref}>{site.phone}</a></li>
+    <li><strong>Datos registrales:</strong> <V value={site.legal.registry} /></li>
+  </ul>
+
+  <h2 id="objeto">Objeto</h2>
+  <p>
+    Este sitio web ({site.url.replace('https://', '')}) tiene como finalidad informar sobre los servicios de {site.name} —diseño web, marketing digital, automatización, inteligencia artificial, software y consultoría— y facilitar el contacto con potenciales clientes.
+  </p>
+  <p>El acceso y uso de la web atribuye la condición de usuario e implica la aceptación de este aviso legal. Si no estás de acuerdo, te pedimos que no utilices el sitio.</p>
+
+  <h2 id="condiciones">Condiciones de uso</h2>
+  <p>El usuario se compromete a hacer un uso adecuado de los contenidos y servicios de la web y, en particular, a no:</p>
+  <ul>
+    <li>Utilizarlos para actividades ilícitas o contrarias a la buena fe y al orden público.</li>
+    <li>Provocar daños en los sistemas del titular, de sus proveedores o de terceros, ni introducir virus o código malicioso.</li>
+    <li>Intentar acceder a áreas restringidas o utilizar datos de otros usuarios.</li>
+    <li>Enviar comunicaciones comerciales no solicitadas a través de los formularios.</li>
+  </ul>
+
+  <h2 id="propiedad">Propiedad intelectual e industrial</h2>
+  <p>
+    Todos los contenidos de la web —textos, diseño, ilustraciones, imágenes, logotipos, código y su selección y disposición— son titularidad de {site.name} o de terceros que han autorizado su uso, y están protegidos por la normativa de propiedad intelectual e industrial.
+  </p>
+  <p>Queda prohibida su reproducción, distribución, comunicación pública o transformación sin autorización expresa, salvo para uso personal y privado.</p>
+
+  <h2 id="responsabilidad">Responsabilidad</h2>
+  <p>
+    {site.name} trabaja para que la información de esta web sea exacta y esté actualizada, pero no garantiza la ausencia de errores ni la disponibilidad ininterrumpida del sitio. No se responsabiliza de los daños derivados del uso de la información publicada, de interrupciones técnicas ajenas a su control ni de la presencia de elementos maliciosos introducidos por terceros.
+  </p>
+  <p>La información de la web tiene carácter orientativo y no constituye una oferta vinculante. Las condiciones de cada servicio se fijan en la propuesta y el contrato correspondientes.</p>
+
+  <h2 id="enlaces">Enlaces</h2>
+  <p>
+    La web puede contener enlaces a sitios de terceros. {site.name} no controla su contenido ni se responsabiliza de él. Si tienes conocimiento de que un enlace dirige a contenido ilícito, puedes comunicárnoslo en <a href={`mailto:${site.email}`}>{site.email}</a> y lo retiraremos.
+  </p>
+
+  <h2 id="datos">Protección de datos y cookies</h2>
+  <p>
+    El tratamiento de los datos personales que nos facilites se rige por nuestra <a href="/politica-de-privacidad/">política de privacidad</a>. El uso de cookies y tecnologías similares se explica en la <a href="/politica-de-cookies/">política de cookies</a>.
+  </p>
+
+  <h2 id="ley">Legislación y jurisdicción</h2>
+  <p>
+    Este aviso legal se rige por la legislación española. Para cualquier controversia, las partes se someten a los juzgados y tribunales que correspondan conforme a la ley. Cuando el usuario tenga la condición de consumidor, serán competentes los juzgados de su domicilio.
+  </p>
+</LegalLayout>

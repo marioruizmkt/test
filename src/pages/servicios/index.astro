@@ -1,0 +1,398 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import CtaBand from '@/components/CtaBand.astro';
+import { topServices, childrenOf, serviceHref, getService } from '@/data/services';
+import { site } from '@/data/site';
+import { pad } from '@/lib/text';
+
+const breadcrumbs = [{ label: 'Servicios', href: '/servicios/' }];
+
+const needs = [
+  { id: 'clientes', label: 'Necesito más clientes', text: 'Atraemos tráfico cualificado y lo convertimos en contactos con una web que vende y campañas medidas en euros.', services: ['marketing', 'diseno-web'] },
+  { id: 'tiempo', label: 'Necesito recuperar tiempo', text: 'Conectamos tus herramientas y aplicamos IA para que lo repetitivo se haga solo y nada dependa de la memoria de nadie.', services: ['automatizacion', 'inteligencia-artificial'] },
+  { id: 'herramienta', label: 'Necesito una herramienta propia', text: 'Convertimos tu forma de trabajar en software: áreas de cliente, gestión de pedidos, presupuestadores o apps.', services: ['software', 'software/a-medida'] },
+  { id: 'rumbo', label: 'No sé por dónde empezar', text: 'Hacemos un diagnóstico honesto y una hoja de ruta priorizada para que cada euro vaya a lo que más mueve tu negocio.', services: ['consultoria'] },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    name: 'Servicios de Globalízame',
+    itemListElement: topServices.map((s, i) => ({ '@type': 'ListItem', position: i + 1, url: new URL(serviceHref(s), site.url).href, name: s.name })),
+  },
+];
+---
+
+<BaseLayout
+  title="Servicios digitales para pymes"
+  description="Diseño web, marketing digital, automatización, inteligencia artificial, software a medida y consultoría para pymes. Piezas que funcionan como un único sistema."
+  breadcrumbs={breadcrumbs}
+  schema={schema}
+>
+  <section class="phero">
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+      <div class="phero__grid">
+        <h1 data-reveal>Todo lo que tu negocio necesita para <em>funcionar sin ti</em>.</h1>
+        <p class="lead" data-reveal style="--d:1">
+          Seis servicios que puedes contratar por separado, pero que rinden de verdad cuando trabajan juntos. Elige por dónde empezar o deja que te ayudemos a decidirlo.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ÍNDICE -->
+  <section class="index">
+    <div class="container">
+      <ol role="list" class="index__list">
+        {topServices.map((s, i) => (
+          <li class="index__row" data-reveal>
+            <a href={serviceHref(s)} class="index__link">
+              <span class="index__num mono">{pad(i + 1)}</span>
+              <span class="index__name">{s.name}</span>
+              <span class="index__text">{s.card.text}</span>
+              <span class="index__img" aria-hidden="true">
+                <Image src={s.image} alt="" width={260} height={260} loading="lazy" />
+              </span>
+              <span class="index__arrow"><Icon name="arrow-up-right" size={22} /></span>
+            </a>
+            {childrenOf(s.slug).length > 0 && (
+              <ul role="list" class="index__children">
+                {childrenOf(s.slug).map((c) => (
+                  <li><a href={serviceHref(c)} class="chip"><Icon name="arrow" size={14} /> {c.name}</a></li>
+                ))}
+              </ul>
+            )}
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+
+  <!-- SELECTOR -->
+  <section class="section section--dark picker rounded">
+    <div class="container">
+      <div class="section-head section-head--split">
+        <div data-reveal>
+          <p class="eyebrow">¿Por dónde empiezo?</p>
+          <h2>Dinos qué te preocupa. <em>Te decimos</em> por dónde ir.</h2>
+        </div>
+        <p class="lead" data-reveal style="--d:1">No hace falta saber de tecnología. Empieza por el problema y nosotros traducimos.</p>
+      </div>
+
+      <div class="picker__ui" data-picker>
+        <div class="picker__tabs" role="tablist" aria-label="¿Qué necesitas?">
+          {needs.map((n, i) => (
+            <button
+              role="tab"
+              type="button"
+              id={`tab-${n.id}`}
+              aria-controls={`panel-${n.id}`}
+              aria-selected={i === 0 ? 'true' : 'false'}
+              tabindex={i === 0 ? 0 : -1}
+              class="picker__tab"
+            >
+              <span class="mono">{pad(i + 1)}</span> {n.label}
+            </button>
+          ))}
+        </div>
+        <div class="picker__panels">
+          {needs.map((n, i) => (
+            <div role="tabpanel" id={`panel-${n.id}`} aria-labelledby={`tab-${n.id}`} class="picker__panel" hidden={i !== 0}>
+              <p class="picker__text">{n.text}</p>
+              <ul role="list" class="picker__services">
+                {n.services.map((slug) => {
+                  const s = getService(slug)!;
+                  return (
+                    <li>
+                      <a href={serviceHref(s)} class="picker__service">
+                        <Image src={s.image} alt="" width={160} height={160} loading="lazy" />
+                        <span>
+                          <strong>{s.name}</strong>
+                          <small>{s.card.title}</small>
+                        </span>
+                        <Icon name="arrow" size={18} />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand title="¿Lo vemos *juntos*?" text="En una primera conversación de 30 minutos entendemos tu caso y te decimos qué haríamos nosotros. Sin compromiso." />
+</BaseLayout>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-picker]').forEach((root) => {
+    const tabs = [...root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    const select = (tab: HTMLButtonElement, focus = false) => {
+      tabs.forEach((t) => {
+        const on = t === tab;
+        t.setAttribute('aria-selected', String(on));
+        t.tabIndex = on ? 0 : -1;
+        root.querySelector<HTMLElement>(`#${t.getAttribute('aria-controls')}`)!.hidden = !on;
+      });
+      if (focus) tab.focus();
+    };
+    tabs.forEach((t, i) => {
+      t.addEventListener('click', () => select(t));
+      t.addEventListener('keydown', (e) => {
+        const dir = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[e.key];
+        if (dir) {
+          e.preventDefault();
+          select(tabs[(i + dir + tabs.length) % tabs.length], true);
+        }
+      });
+    });
+  });
+</script>
+
+<style>
+  .phero {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+  }
+  .phero__grid {
+    display: grid;
+    gap: 2rem;
+    margin-top: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+  .phero h1 {
+    max-width: 16ch;
+  }
+  @media (min-width: 1024px) {
+    .phero__grid {
+      grid-template-columns: 1.4fr 0.6fr;
+      align-items: end;
+      gap: 4rem;
+    }
+  }
+
+  /* Índice */
+  .index {
+    padding-bottom: var(--section);
+  }
+  .index__list {
+    border-top: 1px solid var(--line-strong);
+  }
+  .index__row {
+    border-bottom: 1px solid var(--line-strong);
+  }
+  .index__link {
+    position: relative;
+    display: grid;
+    grid-template-columns: 2.5rem 1fr auto;
+    gap: 0.5rem 1rem;
+    align-items: center;
+    padding: 1.75rem 0;
+  }
+  .index__num {
+    color: var(--muted);
+  }
+  .index__name {
+    font-size: clamp(1.75rem, 1.2rem + 2.6vw, 3.75rem);
+    font-weight: 540;
+    letter-spacing: -0.045em;
+    line-height: 1.05;
+    transition: transform 0.6s var(--ease), color 0.3s;
+  }
+  .index__text {
+    grid-column: 2 / 3;
+    color: var(--muted);
+    max-width: 44ch;
+  }
+  .index__arrow {
+    grid-row: 1;
+    grid-column: 3;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    transition: background-color 0.3s, transform 0.5s var(--ease-spring), box-shadow 0.3s;
+  }
+  .index__link:hover .index__arrow {
+    background: var(--green);
+    box-shadow: none;
+    transform: rotate(45deg);
+  }
+  .index__img {
+    display: none;
+  }
+  .index__children {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 0 1.75rem 3.5rem;
+    margin-top: -0.5rem;
+  }
+  .index__children .chip:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  @media (min-width: 900px) {
+    .index__link {
+      grid-template-columns: 4rem minmax(0, 1.1fr) minmax(0, 0.9fr) 3rem;
+      gap: 2rem;
+      padding: 2.25rem 0;
+    }
+    .index__text {
+      grid-column: 3;
+      grid-row: 1;
+    }
+    .index__arrow {
+      grid-column: 4;
+    }
+    .index__children {
+      padding-left: 6rem;
+    }
+    .index__link:hover .index__name {
+      transform: translateX(0.75rem);
+    }
+    .index__img {
+      display: block;
+      position: absolute;
+      left: 48%;
+      top: 50%;
+      width: 10rem;
+      pointer-events: none;
+      opacity: 0;
+      transform: translate(-50%, -40%) scale(0.7) rotate(-10deg);
+      transition: opacity 0.35s var(--ease), transform 0.6s var(--ease-spring);
+      z-index: 2;
+    }
+    .index__img :global(img) {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+      object-fit: contain;
+      filter: drop-shadow(0 20px 25px rgb(20 23 20 / 0.2));
+    }
+    .index__link:hover .index__img {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1) rotate(0);
+    }
+    .index__link:hover .index__text {
+      opacity: 0.25;
+    }
+    .index__text {
+      transition: opacity 0.3s;
+    }
+  }
+
+  /* Selector */
+  .picker {
+    margin-inline: clamp(0rem, 1vw, 1rem);
+  }
+  .picker__ui {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .picker__tabs {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .picker__tab {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    text-align: left;
+    padding: 1.1rem 1.25rem;
+    border-radius: var(--radius);
+    font-size: var(--fs-md);
+    font-weight: 540;
+    letter-spacing: -0.02em;
+    color: rgb(242 239 233 / 0.7);
+    box-shadow: inset 0 0 0 1px rgb(242 239 233 / 0.12);
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .picker__tab .mono {
+    color: rgb(242 239 233 / 0.45);
+  }
+  .picker__tab:hover {
+    color: var(--paper);
+    box-shadow: inset 0 0 0 1px rgb(242 239 233 / 0.3);
+  }
+  .picker__tab[aria-selected='true'] {
+    background: var(--green);
+    color: var(--ink);
+    box-shadow: none;
+  }
+  .picker__tab[aria-selected='true'] .mono {
+    color: var(--ink);
+  }
+  .picker__panel {
+    --muted: #5b6159;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    color: var(--ink);
+    animation: panelIn 0.5s var(--ease);
+  }
+  @keyframes panelIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+  .picker__text {
+    font-size: var(--fs-lg);
+    letter-spacing: -0.025em;
+    line-height: 1.3;
+    margin-bottom: 2rem;
+    max-width: 30ch;
+  }
+  .picker__services {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .picker__service {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.75rem 1.25rem 0.75rem 0.75rem;
+    border-radius: var(--radius);
+    background: var(--white);
+    box-shadow: 0 1px 0 var(--line);
+    transition: transform 0.4s var(--ease);
+  }
+  .picker__service:hover {
+    transform: translateX(4px);
+  }
+  .picker__service :global(img) {
+    width: 4.5rem;
+    height: 4.5rem;
+    object-fit: contain;
+  }
+  .picker__service strong {
+    display: block;
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.015em;
+  }
+  .picker__service small {
+    color: var(--muted);
+    font-size: 0.875rem;
+  }
+  @media (min-width: 900px) {
+    .picker__ui {
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 2rem;
+      align-items: start;
+    }
+    .picker__panel {
+      min-height: 100%;
+    }
+  }
+</style>

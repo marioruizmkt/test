@@ -1,0 +1,279 @@
+---
+/**
+ * Gestor de consentimiento de cookies (LSSI + RGPD).
+ *
+ * Los scripts no esenciales se declaran así y solo se ejecutan tras el consentimiento:
+ *   <script type="text/plain" data-consent="analytics" src="..."></script>
+ *   <script type="text/plain" data-consent="marketing">...</script>
+ *
+ * La elección se guarda en localStorage (clave `gz-consent`) durante 12 meses.
+ * Cualquier elemento con [data-cookie-settings] reabre el panel.
+ */
+---
+
+<div class="cookies" data-cookies hidden role="dialog" aria-modal="false" aria-labelledby="cookies-title" aria-describedby="cookies-desc">
+  <div class="cookies__card">
+    <div class="cookies__main" data-cookies-main>
+      <p class="cookies__title" id="cookies-title">Cookies, las justas.</p>
+      <p class="cookies__text" id="cookies-desc">
+        Usamos cookies técnicas para que la web funcione y, solo si nos dejas, otras para medir visitas y mejorar nuestras campañas.{' '}
+        <a href="/politica-de-cookies/">Más información</a>.
+      </p>
+    </div>
+
+    <form class="cookies__prefs" data-cookies-prefs hidden>
+      <fieldset>
+        <legend class="visually-hidden">Preferencias de cookies</legend>
+        <label class="toggle">
+          <span><strong>Técnicas</strong><small>Necesarias para que la web funcione. Siempre activas.</small></span>
+          <input type="checkbox" checked disabled />
+          <span class="toggle__ui" aria-hidden="true"></span>
+        </label>
+        <label class="toggle">
+          <span><strong>Analíticas</strong><small>Nos ayudan a entender qué páginas funcionan.</small></span>
+          <input type="checkbox" name="analytics" />
+          <span class="toggle__ui" aria-hidden="true"></span>
+        </label>
+        <label class="toggle">
+          <span><strong>Publicidad</strong><small>Miden la eficacia de nuestras campañas.</small></span>
+          <input type="checkbox" name="marketing" />
+          <span class="toggle__ui" aria-hidden="true"></span>
+        </label>
+      </fieldset>
+    </form>
+
+    <div class="cookies__actions">
+      <button type="button" class="cookies__btn cookies__btn--text" data-cookies-action="config">Configurar</button>
+      <button type="button" class="cookies__btn cookies__btn--ghost" data-cookies-action="reject">Rechazar</button>
+      <button type="button" class="cookies__btn" data-cookies-action="accept">Aceptar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  type Consent = { analytics: boolean; marketing: boolean; date: number; v: 1 };
+  const KEY = 'gz-consent';
+  const MAX_AGE = 1000 * 60 * 60 * 24 * 365;
+
+  const root = document.querySelector<HTMLElement>('[data-cookies]')!;
+  const prefs = root.querySelector<HTMLFormElement>('[data-cookies-prefs]')!;
+  const configBtn = root.querySelector<HTMLButtonElement>('[data-cookies-action="config"]')!;
+
+  const read = (): Consent | null => {
+    try {
+      const c = JSON.parse(localStorage.getItem(KEY) || 'null') as Consent | null;
+      return c && Date.now() - c.date < MAX_AGE ? c : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const apply = (c: Consent) => {
+    document.querySelectorAll<HTMLScriptElement>('script[type="text/plain"][data-consent]').forEach((old) => {
+      const cat = old.dataset.consent as 'analytics' | 'marketing';
+      if (!c[cat]) return;
+      const s = document.createElement('script');
+      [...old.attributes].forEach((a) => a.name !== 'type' && s.setAttribute(a.name, a.value));
+      s.text = old.text;
+      old.replaceWith(s);
+    });
+    document.dispatchEvent(new CustomEvent('gz:consent', { detail: c }));
+  };
+
+  const save = (analytics: boolean, marketing: boolean) => {
+    const c: Consent = { analytics, marketing, date: Date.now(), v: 1 };
+    try {
+      localStorage.setItem(KEY, JSON.stringify(c));
+    } catch {}
+    hide();
+    apply(c);
+  };
+
+  const show = (withPrefs = false) => {
+    const c = read();
+    (prefs.elements.namedItem('analytics') as HTMLInputElement).checked = !!c?.analytics;
+    (prefs.elements.namedItem('marketing') as HTMLInputElement).checked = !!c?.marketing;
+    prefs.hidden = !withPrefs;
+    configBtn.textContent = withPrefs ? 'Guardar selección' : 'Configurar';
+    root.hidden = false;
+    requestAnimationFrame(() => root.classList.add('is-visible'));
+  };
+  const hide = () => {
+    root.classList.remove('is-visible');
+    setTimeout(() => (root.hidden = true), 400);
+  };
+
+  root.addEventListener('click', (e) => {
+    const action = (e.target as HTMLElement).closest<HTMLElement>('[data-cookies-action]')?.dataset.cookiesAction;
+    if (action === 'accept') save(true, true);
+    if (action === 'reject') save(false, false);
+    if (action === 'config') {
+      if (prefs.hidden) {
+        prefs.hidden = false;
+        configBtn.textContent = 'Guardar selección';
+      } else {
+        const f = prefs.elements;
+        save((f.namedItem('analytics') as HTMLInputElement).checked, (f.namedItem('marketing') as HTMLInputElement).checked);
+      }
+    }
+  });
+
+  document.addEventListener('click', (e) => {
+    if ((e.target as HTMLElement).closest('[data-cookie-settings]')) show(true);
+  });
+
+  const existing = read();
+  if (existing) apply(existing);
+  else setTimeout(() => show(false), 900);
+</script>
+
+<style>
+  .cookies {
+    position: fixed;
+    z-index: 90;
+    left: var(--gutter);
+    right: var(--gutter);
+    bottom: var(--gutter);
+    display: flex;
+    justify-content: flex-start;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.4s var(--ease), transform 0.5s var(--ease);
+  }
+  .cookies.is-visible {
+    opacity: 1;
+    transform: none;
+  }
+  .cookies__card {
+    pointer-events: auto;
+    width: 100%;
+    max-width: 27rem;
+    padding: 1.5rem;
+    border-radius: var(--radius);
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: 0 30px 70px -20px rgb(20 23 20 / 0.5);
+    display: grid;
+    gap: 1.25rem;
+  }
+  .cookies__title {
+    font-weight: 600;
+    font-size: 1.125rem;
+    letter-spacing: -0.02em;
+    margin-bottom: 0.4rem;
+  }
+  .cookies__text {
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: rgb(242 239 233 / 0.72);
+  }
+  .cookies__text a {
+    color: var(--paper);
+    text-decoration: underline;
+    text-decoration-color: var(--green);
+    text-underline-offset: 3px;
+  }
+  .cookies__prefs fieldset {
+    border: 0;
+    padding: 0;
+    display: grid;
+    gap: 0.25rem;
+  }
+  .toggle {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.7rem 0;
+    border-top: 1px solid rgb(242 239 233 / 0.12);
+    cursor: pointer;
+  }
+  .toggle strong {
+    display: block;
+    font-size: 0.9375rem;
+    font-weight: 600;
+  }
+  .toggle small {
+    display: block;
+    font-size: 0.8125rem;
+    color: rgb(242 239 233 / 0.6);
+  }
+  .toggle input {
+    position: absolute;
+    opacity: 0;
+    right: 0;
+    width: 2.75rem;
+    height: 1.6rem;
+    margin: 0;
+    cursor: pointer;
+  }
+  .toggle__ui {
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 1.6rem;
+    border-radius: 999px;
+    background: rgb(242 239 233 / 0.18);
+    position: relative;
+    transition: background-color 0.25s;
+  }
+  .toggle__ui::after {
+    content: '';
+    position: absolute;
+    top: 0.2rem;
+    left: 0.2rem;
+    width: 1.2rem;
+    height: 1.2rem;
+    border-radius: 50%;
+    background: var(--paper);
+    transition: transform 0.3s var(--ease-spring);
+  }
+  .toggle input:checked + .toggle__ui {
+    background: var(--green);
+  }
+  .toggle input:checked + .toggle__ui::after {
+    transform: translateX(1.15rem);
+    background: var(--ink);
+  }
+  .toggle input:disabled + .toggle__ui {
+    opacity: 0.55;
+  }
+  .toggle input:focus-visible + .toggle__ui {
+    outline: 2px solid var(--green);
+    outline-offset: 2px;
+  }
+  .cookies__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    align-items: center;
+  }
+  .cookies__btn {
+    flex: 1 1 auto;
+    min-height: 2.75rem;
+    padding: 0 1.1rem;
+    border-radius: 999px;
+    background: var(--green);
+    color: var(--ink);
+    font-weight: 600;
+    font-size: 0.9375rem;
+    transition: transform 0.2s, background-color 0.2s;
+  }
+  .cookies__btn:active {
+    transform: scale(0.97);
+  }
+  .cookies__btn--ghost {
+    background: transparent;
+    color: var(--paper);
+    box-shadow: inset 0 0 0 1px rgb(242 239 233 / 0.3);
+  }
+  .cookies__btn--text {
+    flex: 0 0 auto;
+    background: transparent;
+    color: rgb(242 239 233 / 0.8);
+    padding: 0 0.5rem;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+</style>

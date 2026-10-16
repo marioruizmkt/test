@@ -1,0 +1,69 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/Button.astro';
+import { topServices, serviceHref } from '@/data/services';
+import roto from '@/assets/3d/error-404.png';
+---
+
+<BaseLayout title="Página no encontrada" description="Esta página no existe o ha cambiado de sitio." noindex>
+  <section class="nf">
+    <div class="container nf__grid">
+      <div class="nf__copy">
+        <p class="eyebrow">Error 404</p>
+        <h1>Aquí la pieza <em>se salió del raíl</em>.</h1>
+        <p class="lead">La página que buscas no existe o ha cambiado de sitio. Vuelve al inicio o sigue por alguno de estos caminos.</p>
+        <div class="btn-row">
+          <Button href="/" variant="green">Volver al inicio</Button>
+          <Button href="/contacto/" variant="ghost">Contactar</Button>
+        </div>
+        <ul role="list" class="nf__links">
+          {topServices.map((s) => <li><a href={serviceHref(s)} class="chip">{s.navLabel}</a></li>)}
+        </ul>
+      </div>
+      <div class="nf__art">
+        <Image src={roto} alt="Raíl de canicas roto con la bola verde caída en el suelo" widths={[360, 640]} sizes="(min-width: 900px) 40vw, 80vw" loading="eager" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .nf {
+    padding-block: clamp(3rem, 2rem + 4vw, 7rem) var(--section);
+  }
+  .nf__grid {
+    display: grid;
+    gap: 3rem;
+    align-items: center;
+  }
+  .nf__copy {
+    display: grid;
+    gap: 1.75rem;
+    justify-items: start;
+  }
+  .nf__copy h1 {
+    font-size: clamp(2.5rem, 1.4rem + 4.4vw, 5.5rem);
+    max-width: 13ch;
+  }
+  .nf__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+  }
+  .nf__links .chip:hover {
+    background: var(--ink);
+    color: var(--paper);
+    border-color: var(--ink);
+  }
+  .nf__art {
+    width: min(100%, 32rem);
+    justify-self: center;
+  }
+  @media (min-width: 900px) {
+    .nf__grid {
+      grid-template-columns: 1.1fr 0.9fr;
+    }
+  }
+</style>

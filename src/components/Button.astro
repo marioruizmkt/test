@@ -1,0 +1,26 @@
+---
+import Icon from './Icon.astro';
+
+interface Props {
+  href: string;
+  variant?: 'ink' | 'green' | 'ghost' | 'light';
+  size?: 'md' | 'sm';
+  icon?: 'arrow' | 'arrow-up-right' | 'mail' | 'phone' | 'whatsapp' | false;
+  class?: string;
+  [key: string]: unknown;
+}
+const { href, variant = 'ink', size = 'md', icon = 'arrow', class: className, ...rest } = Astro.props;
+const external = /^https?:/.test(href);
+---
+
+<a
+  href={href}
+  class:list={['btn', variant !== 'ink' && `btn--${variant}`, size === 'sm' && 'btn--sm', className]}
+  {...(external ? { target: '_blank', rel: 'noopener' } : {})}
+  {...rest}
+>
+  <span><slot /></span>
+  {icon && variant !== 'ghost' && (
+    <span class="btn__icon"><Icon name={icon} /></span>
+  )}
+</a>

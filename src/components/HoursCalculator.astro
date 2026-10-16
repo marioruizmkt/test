@@ -1,0 +1,205 @@
+---
+import Button from './Button.astro';
+interface Props {
+  compact?: boolean;
+}
+const { compact = false } = Astro.props;
+---
+
+<div class:list={['calc', { 'calc--compact': compact }]} data-calc>
+  <div class="calc__inputs">
+    <label class="calc__field">
+      <span class="calc__label">Horas a la semana en tareas repetitivas <small>por persona</small></span>
+      <span class="calc__row">
+        <input type="range" min="1" max="30" step="1" value="8" name="hours" aria-describedby="calc-hours-out" />
+        <output id="calc-hours-out" class="calc__value" data-out="hours">8 h</output>
+      </span>
+    </label>
+    <label class="calc__field">
+      <span class="calc__label">Personas que las hacen</span>
+      <span class="calc__row">
+        <input type="range" min="1" max="20" step="1" value="2" name="people" />
+        <output class="calc__value" data-out="people">2</output>
+      </span>
+    </label>
+    <label class="calc__field">
+      <span class="calc__label">Coste aproximado por hora <small>salario + cargas</small></span>
+      <span class="calc__row">
+        <input type="range" min="10" max="80" step="1" value="22" name="cost" />
+        <output class="calc__value" data-out="cost">22 €</output>
+      </span>
+    </label>
+  </div>
+
+  <div class="calc__result" aria-live="polite">
+    <p class="calc__kicker mono">Al año dedicáis</p>
+    <p class="calc__big"><span data-out="yearHours">736</span><span class="calc__unit">horas</span></p>
+    <p class="calc__money">≈ <strong data-out="yearCost">16.192 €</strong> en tareas que podría hacer un sistema.</p>
+    <p class="calc__half">
+      Si automatizamos solo la mitad, recuperas <strong data-out="halfDays">46</strong> jornadas de trabajo al año.
+    </p>
+    <p class="calc__note">Estimación orientativa: 46 semanas laborables y jornadas de 8 horas.</p>
+    {!compact && <Button href="/contacto/">Quiero recuperar ese tiempo</Button>}
+  </div>
+</div>
+
+<script>
+  const fmt = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 });
+  document.querySelectorAll<HTMLElement>('[data-calc]').forEach((root) => {
+    const get = (n: string) => Number(root.querySelector<HTMLInputElement>(`input[name="${n}"]`)!.value);
+    const set = (k: string, v: string) => root.querySelectorAll(`[data-out="${k}"]`).forEach((el) => (el.textContent = v));
+    const update = () => {
+      const hours = get('hours');
+      const people = get('people');
+      const cost = get('cost');
+      const yearHours = hours * people * 46;
+      set('hours', `${hours} h`);
+      set('people', String(people));
+      set('cost', `${cost} €`);
+      set('yearHours', fmt.format(yearHours));
+      set('yearCost', `${fmt.format(yearHours * cost)} €`);
+      set('halfDays', fmt.format(yearHours / 2 / 8));
+      root.querySelectorAll<HTMLInputElement>('input[type="range"]').forEach((r) => {
+        const p = ((Number(r.value) - Number(r.min)) / (Number(r.max) - Number(r.min))) * 100;
+        r.style.setProperty('--p', `${p}%`);
+      });
+    };
+    root.addEventListener('input', update);
+    update();
+  });
+</script>
+
+<style>
+  .calc {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .calc__inputs {
+    display: grid;
+    gap: 1.75rem;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: var(--radius-lg);
+    background: rgb(242 239 233 / 0.06);
+    box-shadow: inset 0 0 0 1px rgb(242 239 233 / 0.1);
+  }
+  .calc__field {
+    display: grid;
+    gap: 0.75rem;
+  }
+  .calc__label {
+    font-weight: 500;
+    font-size: 0.96875rem;
+  }
+  .calc__label small {
+    color: var(--muted);
+    font-size: 0.8125rem;
+    margin-left: 0.3rem;
+  }
+  .calc__row {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  .calc__value {
+    min-width: 4rem;
+    text-align: right;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 1.0625rem;
+    color: var(--green);
+  }
+  input[type='range'] {
+    --p: 50%;
+    flex: 1;
+    appearance: none;
+    -webkit-appearance: none;
+    height: 2rem;
+    background: transparent;
+    cursor: pointer;
+  }
+  input[type='range']::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 6px;
+    background: linear-gradient(to right, var(--green) var(--p), rgb(242 239 233 / 0.15) var(--p));
+  }
+  input[type='range']::-moz-range-track {
+    height: 6px;
+    border-radius: 6px;
+    background: linear-gradient(to right, var(--green) var(--p), rgb(242 239 233 / 0.15) var(--p));
+  }
+  input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 1.5rem;
+    height: 1.5rem;
+    margin-top: calc(3px - 0.75rem);
+    border-radius: 50%;
+    background: var(--paper);
+    border: 5px solid var(--green);
+    transition: transform 0.2s;
+  }
+  input[type='range']::-moz-range-thumb {
+    width: 1.5rem;
+    height: 1.5rem;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--paper);
+    border: 5px solid var(--green);
+  }
+  input[type='range']:active::-webkit-slider-thumb {
+    transform: scale(1.15);
+  }
+  input[type='range']:focus-visible {
+    outline: 2px solid var(--green);
+    outline-offset: 4px;
+    border-radius: 6px;
+  }
+  .calc__result {
+    display: grid;
+    gap: 0.9rem;
+    align-content: center;
+    justify-items: start;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-radius: var(--radius-lg);
+    background: var(--green);
+    color: var(--ink);
+  }
+  .calc__big {
+    display: flex;
+    align-items: baseline;
+    gap: 0.75rem;
+    font-size: clamp(3.5rem, 2.5rem + 5vw, 7rem);
+    font-weight: 560;
+    letter-spacing: -0.06em;
+    line-height: 0.9;
+    font-variant-numeric: tabular-nums;
+  }
+  .calc__unit {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 0.4em;
+    letter-spacing: -0.01em;
+  }
+  .calc__money {
+    font-size: var(--fs-md);
+    line-height: 1.4;
+    max-width: 30ch;
+  }
+  .calc__half {
+    padding-top: 0.9rem;
+    border-top: 1px solid rgb(20 23 20 / 0.2);
+    max-width: 36ch;
+  }
+  .calc__note {
+    font-size: 0.8125rem;
+    opacity: 0.7;
+  }
+  .calc__result :global(.btn) {
+    margin-top: 0.5rem;
+  }
+  @media (min-width: 900px) {
+    .calc {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+</style>

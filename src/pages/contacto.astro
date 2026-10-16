@@ -1,0 +1,621 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Breadcrumbs from '@/components/Breadcrumbs.astro';
+import Icon from '@/components/Icon.astro';
+import { topServices } from '@/data/services';
+import { site } from '@/data/site';
+import bubble from '@/assets/3d/contacto-burbuja.png';
+
+const breadcrumbs = [{ label: 'Contacto', href: '/contacto/' }];
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT ?? '';
+
+const steps = [
+  { title: 'Leemos tu mensaje', text: 'Una persona del equipo lo revisa, no un robot.' },
+  { title: 'Te respondemos', text: 'Con preguntas concretas o una propuesta de llamada corta.' },
+  { title: 'Primera valoración', text: 'Te decimos qué haríamos y si tiene sentido trabajar juntos.' },
+];
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'ContactPage',
+    name: 'Contacto · Globalízame',
+    url: `${site.url}/contacto/`,
+    mainEntity: { '@id': `${site.url}/#organizacion` },
+  },
+];
+---
+
+<BaseLayout
+  title="Contacto"
+  description="Cuéntanos qué quieres conseguir o qué te quita tiempo. Escríbenos por el formulario, email, teléfono o WhatsApp y te respondemos con una primera valoración."
+  breadcrumbs={breadcrumbs}
+  schema={schema}
+>
+  <section class="contact">
+    <div class="container">
+      <Breadcrumbs items={breadcrumbs} />
+      <div class="contact__grid">
+        <aside class="contact__side">
+          <p class="eyebrow" data-reveal>Contacto</p>
+          <h1 data-reveal style="--d:1">Cuéntanos <em>tu caso</em>.</h1>
+          <p class="lead" data-reveal style="--d:2">
+            Qué quieres conseguir, qué te quita tiempo o qué no termina de funcionar. Con eso nos basta para empezar.
+          </p>
+
+          <ul role="list" class="channels" data-reveal style="--d:3">
+            <li>
+              <a href={`mailto:${site.email}`} class="channel">
+                <span class="channel__icon"><Icon name="mail" /></span>
+                <span><small>Email</small>{site.email}</span>
+              </a>
+            </li>
+            <li>
+              <a href={site.phoneHref} class="channel">
+                <span class="channel__icon"><Icon name="phone" /></span>
+                <span><small>Teléfono</small>{site.phone}</span>
+              </a>
+            </li>
+            <li>
+              <a href={site.whatsapp} class="channel" target="_blank" rel="noopener">
+                <span class="channel__icon channel__icon--green"><Icon name="whatsapp" /></span>
+                <span><small>WhatsApp</small>Escríbenos directamente</span>
+              </a>
+            </li>
+          </ul>
+
+          <div class="contact__art" aria-hidden="true">
+            <Image src={bubble} alt="" widths={[280, 440]} sizes="(min-width: 1024px) 18vw, 40vw" loading="eager" class="float float--slow" />
+          </div>
+        </aside>
+
+        <div class="formcard" data-reveal="fade" style="--d:2">
+          <form class="form" data-contact-form data-endpoint={endpoint} novalidate>
+            <fieldset class="form__chips">
+              <legend class="form__label">¿En qué podemos ayudarte? <small>Elige una o varias</small></legend>
+              <div class="chips">
+                {topServices.map((s) => (
+                  <label class="pick">
+                    <input type="checkbox" name="servicios" value={s.name} />
+                    <span>{s.navLabel}</span>
+                  </label>
+                ))}
+                <label class="pick">
+                  <input type="checkbox" name="servicios" value="Aún no lo sé" />
+                  <span>Aún no lo sé</span>
+                </label>
+              </div>
+            </fieldset>
+
+            <div class="form__row">
+              <div class="field">
+                <label for="f-nombre" class="form__label">Nombre</label>
+                <input id="f-nombre" name="nombre" type="text" autocomplete="name" required placeholder="Tu nombre" />
+                <p class="field__error" data-error-for="nombre">Dinos cómo te llamas.</p>
+              </div>
+              <div class="field">
+                <label for="f-empresa" class="form__label">Empresa <small>opcional</small></label>
+                <input id="f-empresa" name="empresa" type="text" autocomplete="organization" placeholder="Nombre de tu negocio" />
+              </div>
+            </div>
+
+            <div class="form__row">
+              <div class="field">
+                <label for="f-email" class="form__label">Email</label>
+                <input id="f-email" name="email" type="email" autocomplete="email" required placeholder="tu@empresa.com" />
+                <p class="field__error" data-error-for="email">Necesitamos un email válido para responderte.</p>
+              </div>
+              <div class="field">
+                <label for="f-tel" class="form__label">Teléfono <small>opcional</small></label>
+                <input id="f-tel" name="telefono" type="tel" autocomplete="tel" placeholder="+34" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="f-mensaje" class="form__label">Cuéntanos un poco más</label>
+              <textarea id="f-mensaje" name="mensaje" rows="5" required minlength="10" placeholder="Qué haces, qué quieres conseguir y qué te frena ahora mismo."></textarea>
+              <p class="field__error" data-error-for="mensaje">Escribe al menos un par de líneas.</p>
+            </div>
+
+            <!-- Trampa anti-spam: los humanos no ven este campo -->
+            <div class="hp" aria-hidden="true">
+              <label>No rellenar <input type="text" name="web" tabindex="-1" autocomplete="off" /></label>
+            </div>
+
+            <div class="field">
+              <label class="consent">
+                <input type="checkbox" name="privacidad" required />
+                <span class="consent__box" aria-hidden="true"><Icon name="check" size={14} /></span>
+                <span>He leído y acepto la <a href="/politica-de-privacidad/" target="_blank">política de privacidad</a>.</span>
+              </label>
+              <p class="field__error" data-error-for="privacidad">Necesitamos tu consentimiento para responderte.</p>
+            </div>
+
+            <p class="form__legal">
+              <strong>Responsable:</strong>{' '}{site.legal.owner.startsWith('[') ? <mark class="todo">{site.legal.owner}</mark> : site.legal.owner}.{' '}
+              <strong>Finalidad:</strong> responder a tu consulta y, en su caso, enviarte una propuesta.{' '}
+              <strong>Legitimación:</strong> tu consentimiento.{' '}
+              <strong>Destinatarios:</strong> no se ceden datos a terceros salvo obligación legal.{' '}
+              <strong>Derechos:</strong> acceso, rectificación, supresión y otros, escribiendo a {site.email}. Más información en la{' '}
+              <a href="/politica-de-privacidad/">política de privacidad</a>.
+            </p>
+
+            <div class="form__submit">
+              <button type="submit" class="btn btn--green">
+                <span data-submit-label>Enviar mensaje</span>
+                <span class="btn__icon"><Icon name="arrow" /></span>
+              </button>
+              <p class="form__status" role="status" aria-live="polite" data-status></p>
+            </div>
+          </form>
+
+          <div class="form__done" data-done hidden tabindex="-1">
+            <span class="form__done-icon"><Icon name="check" size={28} /></span>
+            <h2>Mensaje recibido.</h2>
+            <p>Gracias por escribirnos. Lo leemos con calma y te respondemos lo antes posible. Si es urgente, escríbenos por <a href={site.whatsapp} target="_blank" rel="noopener">WhatsApp</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--tight next">
+    <div class="container">
+      <p class="eyebrow" data-reveal>Qué pasa después</p>
+      <ol role="list" class="next__list">
+        {steps.map((s, i) => (
+          <li data-reveal style={`--d:${i}`}>
+            <span class="next__num">{i + 1}</span>
+            <h2 class="next__title">{s.title}</h2>
+            <p>{s.text}</p>
+          </li>
+        ))}
+      </ol>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  import { site } from '@/data/site';
+
+  const form = document.querySelector<HTMLFormElement>('[data-contact-form]');
+  if (form) {
+    const status = form.querySelector<HTMLElement>('[data-status]')!;
+    const label = form.querySelector<HTMLElement>('[data-submit-label]')!;
+    const done = document.querySelector<HTMLElement>('[data-done]')!;
+    const endpoint = form.dataset.endpoint;
+
+    const fieldValid = (el: HTMLInputElement | HTMLTextAreaElement) => {
+      const ok = el.checkValidity();
+      const err = form.querySelector<HTMLElement>(`[data-error-for="${el.name}"]`);
+      el.closest('.field')?.classList.toggle('is-invalid', !ok);
+      el.setAttribute('aria-invalid', String(!ok));
+      if (err) {
+        err.id ||= `err-${el.name}`;
+        if (!ok) el.setAttribute('aria-describedby', err.id);
+        else el.removeAttribute('aria-describedby');
+      }
+      return ok;
+    };
+
+    form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]').forEach((el) => {
+      el.addEventListener('blur', () => el.value && fieldValid(el));
+      el.addEventListener('input', () => el.closest('.field')?.classList.contains('is-invalid') && fieldValid(el));
+      el.addEventListener('change', () => el.type === 'checkbox' && fieldValid(el));
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const required = [...form.querySelectorAll<HTMLInputElement | HTMLTextAreaElement>('[required]')];
+      const invalid = required.filter((el) => !fieldValid(el));
+      if (invalid.length) {
+        invalid[0].focus();
+        status.textContent = 'Revisa los campos marcados.';
+        return;
+      }
+
+      const fd = new FormData(form);
+      if (fd.get('web')) return; // bot
+      const data = {
+        nombre: String(fd.get('nombre') || ''),
+        empresa: String(fd.get('empresa') || ''),
+        email: String(fd.get('email') || ''),
+        telefono: String(fd.get('telefono') || ''),
+        servicios: fd.getAll('servicios').map(String),
+        mensaje: String(fd.get('mensaje') || ''),
+        origen: location.href,
+      };
+
+      // Sin endpoint configurado: se abre el cliente de correo con el mensaje redactado.
+      if (!endpoint) {
+        const header = [
+          `Nombre: ${data.nombre}`,
+          data.empresa && `Empresa: ${data.empresa}`,
+          `Email: ${data.email}`,
+          data.telefono && `Teléfono: ${data.telefono}`,
+          data.servicios.length > 0 && `Interés: ${data.servicios.join(', ')}`,
+        ].filter(Boolean);
+        const body = `${header.join('\n')}\n\n${data.mensaje}`;
+        location.href = `mailto:${site.email}?subject=${encodeURIComponent(`Contacto web · ${data.nombre}`)}&body=${encodeURIComponent(body)}`;
+        status.textContent = 'Abriendo tu programa de correo…';
+        return;
+      }
+
+      label.textContent = 'Enviando…';
+      form.setAttribute('aria-busy', 'true');
+      status.textContent = '';
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify(data),
+        });
+        if (!res.ok) throw new Error(String(res.status));
+        form.hidden = true;
+        done.hidden = false;
+        done.focus();
+      } catch {
+        status.textContent = `No hemos podido enviarlo. Escríbenos a ${site.email} y te respondemos igual.`;
+        label.textContent = 'Enviar mensaje';
+      } finally {
+        form.removeAttribute('aria-busy');
+      }
+    });
+  }
+</script>
+
+<style>
+  .contact {
+    padding-top: clamp(1.5rem, 1rem + 2vw, 3rem);
+    padding-bottom: var(--section);
+  }
+  .contact__grid {
+    display: grid;
+    gap: 3rem;
+    margin-top: clamp(2rem, 1rem + 3vw, 4rem);
+  }
+  .contact__side {
+    display: grid;
+    gap: 1.75rem;
+    align-content: start;
+  }
+  .contact__side h1 {
+    font-size: clamp(2.875rem, 1.6rem + 5vw, 6.5rem);
+  }
+  .channels {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .channel {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem;
+    border-radius: var(--radius);
+    transition: background-color 0.25s;
+    font-weight: 550;
+    font-size: 1.0625rem;
+    letter-spacing: -0.01em;
+    word-break: break-word;
+  }
+  .channel:hover {
+    background: var(--white);
+  }
+  .channel small {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    font-weight: 400;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+  .channel__icon {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--paper);
+  }
+  .channel__icon--green {
+    background: var(--green);
+    color: var(--ink);
+  }
+  .contact__art {
+    display: none;
+  }
+
+  .formcard {
+    position: relative;
+    padding: clamp(1.5rem, 1rem + 2.5vw, 3rem);
+    border-radius: var(--radius-lg);
+    background: var(--white);
+    box-shadow:
+      0 1px 0 var(--line),
+      0 40px 80px -50px rgb(20 23 20 / 0.35);
+  }
+  .form {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .form__row {
+    display: grid;
+    gap: 1.5rem;
+  }
+  .form__label {
+    display: block;
+    font-weight: 560;
+    font-size: 0.9375rem;
+    margin-bottom: 0.5rem;
+  }
+  .form__label small {
+    font-weight: 400;
+    color: var(--muted);
+    margin-left: 0.3rem;
+  }
+  .form__chips {
+    border: 0;
+    padding: 0;
+  }
+  .form__chips legend {
+    margin-bottom: 0.75rem;
+  }
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  .pick {
+    position: relative;
+    cursor: pointer;
+  }
+  .pick input {
+    position: absolute;
+    opacity: 0;
+    inset: 0;
+    cursor: pointer;
+  }
+  .pick span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    transition: background-color 0.2s, box-shadow 0.2s, color 0.2s;
+  }
+  .pick:hover span {
+    box-shadow: inset 0 0 0 1px var(--ink);
+  }
+  .pick input:checked + span {
+    background: var(--ink);
+    color: var(--paper);
+    box-shadow: none;
+  }
+  .pick input:checked + span::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .pick input:focus-visible + span {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .field input,
+  .field textarea {
+    width: 100%;
+    padding: 0.95rem 1.1rem;
+    border-radius: 14px;
+    border: 0;
+    background: var(--paper);
+    box-shadow: inset 0 0 0 1px transparent;
+    font-size: 1rem;
+    transition: box-shadow 0.2s, background-color 0.2s;
+  }
+  .field textarea {
+    resize: vertical;
+    min-height: 8rem;
+  }
+  .field input::placeholder,
+  .field textarea::placeholder {
+    color: rgb(20 23 20 / 0.4);
+  }
+  .field input:hover,
+  .field textarea:hover {
+    box-shadow: inset 0 0 0 1px var(--line-strong);
+  }
+  .field input:focus,
+  .field textarea:focus {
+    outline: none;
+    background: var(--white);
+    box-shadow:
+      inset 0 0 0 1.5px var(--ink),
+      0 0 0 4px rgb(134 202 40 / 0.35);
+  }
+  .field__error {
+    display: none;
+    margin-top: 0.4rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #b42318;
+  }
+  .field.is-invalid .field__error {
+    display: block;
+  }
+  .field.is-invalid input,
+  .field.is-invalid textarea {
+    box-shadow: inset 0 0 0 1.5px #b42318;
+  }
+  .hp {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+  }
+  .consent {
+    position: relative;
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 0.9375rem;
+    cursor: pointer;
+  }
+  .consent input {
+    position: absolute;
+    opacity: 0;
+    width: 1.4rem;
+    height: 1.4rem;
+    margin: 0;
+    cursor: pointer;
+  }
+  .consent__box {
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    width: 1.4rem;
+    height: 1.4rem;
+    border-radius: 6px;
+    box-shadow: inset 0 0 0 1.5px var(--line-strong);
+    color: transparent;
+    transition: background-color 0.2s, color 0.2s;
+  }
+  .consent input:checked + .consent__box {
+    background: var(--green);
+    box-shadow: none;
+    color: var(--ink);
+  }
+  .consent input:focus-visible + .consent__box {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+  .field.is-invalid .consent__box {
+    box-shadow: inset 0 0 0 1.5px #b42318;
+  }
+  .consent a,
+  .form__legal a,
+  .form__done a {
+    text-decoration: underline;
+    text-decoration-color: var(--green);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+  .form__legal {
+    font-size: 0.75rem;
+    line-height: 1.55;
+    color: var(--muted);
+    padding: 1rem 1.1rem;
+    border-radius: 14px;
+    background: var(--paper);
+  }
+  .form__legal strong {
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .form__submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+  }
+  .form__status {
+    font-size: 0.9375rem;
+    color: var(--muted);
+  }
+  .form[aria-busy='true'] .btn {
+    opacity: 0.7;
+    pointer-events: none;
+  }
+  .form__done {
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+    padding: 2rem 0;
+    outline: none;
+  }
+  .form__done-icon {
+    display: grid;
+    place-items: center;
+    width: 4rem;
+    height: 4rem;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .form__done h2 {
+    font-size: var(--fs-xl);
+  }
+  .form__done p {
+    color: var(--muted);
+    max-width: 44ch;
+  }
+
+  @media (min-width: 700px) {
+    .form__row {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (min-width: 1024px) {
+    .contact__grid {
+      grid-template-columns: 0.85fr 1.15fr;
+      gap: 4rem;
+      align-items: start;
+    }
+    .contact__side {
+      position: sticky;
+      top: 7rem;
+    }
+    .contact__art {
+      display: block;
+      width: 13rem;
+      margin-top: 1rem;
+    }
+  }
+
+  .next {
+    border-top: 1px solid var(--line);
+  }
+  .next__list {
+    display: grid;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  .next__list li {
+    display: grid;
+    gap: 0.5rem;
+  }
+  .next__num {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.75rem;
+    margin-bottom: 0.75rem;
+    border-radius: 50%;
+    background: var(--ink);
+    color: var(--green);
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-size: 1.375rem;
+  }
+  .next__title {
+    font-size: 1.5rem;
+    letter-spacing: -0.025em;
+  }
+  .next__list p {
+    color: var(--muted);
+  }
+  @media (min-width: 900px) {
+    .next__list {
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3rem;
+    }
+  }
+</style>

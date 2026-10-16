@@ -1,0 +1,217 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { topServices, childrenOf, serviceHref } from '@/data/services';
+import { site, legalNav } from '@/data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer on-dark">
+  <div class="container">
+    <div class="footer__top">
+      <p class="footer__claim">
+        Hacemos que tu negocio venda más y dependa <em>menos de ti</em>.
+      </p>
+      <a href={`mailto:${site.email}`} class="footer__mail">
+        <span>{site.email}</span>
+        <span class="footer__mail-icon"><Icon name="arrow-up-right" size={28} /></span>
+      </a>
+    </div>
+
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <a href="/" aria-label="Globalízame, ir a inicio" class="footer__logo"><Logo variant="dark" /></a>
+        <p>Agencia digital para pymes. Web, captación, automatización, IA y software que trabajan como un único sistema.</p>
+      </div>
+
+      <nav aria-label="Servicios" class="footer__col">
+        <p class="footer__head">Servicios</p>
+        <ul role="list">
+          {topServices.map((s) => (
+            <>
+              <li><a href={serviceHref(s)}>{s.name}</a></li>
+              {childrenOf(s.slug).map((c) => <li class="footer__child"><a href={serviceHref(c)}>{c.name}</a></li>)}
+            </>
+          ))}
+        </ul>
+      </nav>
+
+      <nav aria-label="Agencia" class="footer__col">
+        <p class="footer__head">Agencia</p>
+        <ul role="list">
+          <li><a href="/">Inicio</a></li>
+          <li><a href="/servicios/">Servicios</a></li>
+          <li><a href="/sobre/">Sobre nosotros</a></li>
+          <li><a href="/contacto/">Contacto</a></li>
+        </ul>
+      </nav>
+
+      <div class="footer__col">
+        <p class="footer__head">Contacto</p>
+        <ul role="list">
+          <li><a href={`mailto:${site.email}`}>{site.email}</a></li>
+          <li><a href={site.phoneHref}>{site.phone}</a></li>
+          <li><a href={site.whatsapp} target="_blank" rel="noopener">WhatsApp</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>© {year} Globalízame</p>
+      <ul role="list" class="footer__legal">
+        {legalNav.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+        <li><button type="button" data-cookie-settings>Configurar cookies</button></li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    background: var(--ink);
+    color: var(--paper);
+    padding-top: clamp(4rem, 3rem + 5vw, 8rem);
+    padding-bottom: 2rem;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    margin-top: -2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .footer__top {
+    display: grid;
+    gap: 2.5rem;
+    padding-bottom: clamp(3rem, 2rem + 4vw, 6rem);
+    border-bottom: 1px solid rgb(242 239 233 / 0.12);
+  }
+  .footer__claim {
+    font-size: var(--fs-xl);
+    font-weight: 540;
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    max-width: 22ch;
+  }
+  .footer__claim em {
+    color: var(--green);
+  }
+  .footer__mail {
+    display: inline-flex;
+    align-items: center;
+    gap: 1rem;
+    justify-self: start;
+    font-size: clamp(1.5rem, 1rem + 2.6vw, 3.25rem);
+    font-weight: 500;
+    letter-spacing: -0.035em;
+    line-height: 1.1;
+    word-break: break-all;
+  }
+  .footer__mail > span:first-child {
+    background-image: linear-gradient(var(--green), var(--green));
+    background-size: 0% 2px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.5s var(--ease);
+  }
+  .footer__mail:hover > span:first-child {
+    background-size: 100% 2px;
+  }
+  .footer__mail-icon {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: clamp(3rem, 2rem + 2.5vw, 4.5rem);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: var(--green);
+    color: var(--ink);
+    transition: transform 0.5s var(--ease-spring);
+  }
+  .footer__mail:hover .footer__mail-icon {
+    transform: rotate(45deg);
+  }
+  .footer__grid {
+    display: grid;
+    gap: 2.5rem;
+    padding-block: 3.5rem;
+    grid-template-columns: 1fr 1fr;
+  }
+  .footer__brand {
+    grid-column: 1 / -1;
+    display: grid;
+    gap: 1.25rem;
+    align-content: start;
+    max-width: 22rem;
+  }
+  .footer__brand p {
+    color: rgb(242 239 233 / 0.6);
+    font-size: 0.9375rem;
+  }
+  .footer__logo {
+    width: 9.5rem;
+  }
+  .footer__head {
+    font-family: var(--font-mono);
+    font-size: var(--fs-xs);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: rgb(242 239 233 / 0.45);
+    margin-bottom: 1rem;
+  }
+  .footer__col ul {
+    display: grid;
+    gap: 0.55rem;
+    font-size: 0.9375rem;
+  }
+  .footer__col a {
+    color: rgb(242 239 233 / 0.85);
+    transition: color 0.2s;
+  }
+  .footer__col a:hover {
+    color: var(--green);
+  }
+  .footer__child {
+    padding-left: 0.9rem;
+    position: relative;
+    font-size: 0.875rem;
+  }
+  .footer__child::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 0.45rem;
+    height: 1px;
+    background: rgb(242 239 233 / 0.4);
+  }
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 1rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgb(242 239 233 / 0.12);
+    font-size: 0.8125rem;
+    color: rgb(242 239 233 / 0.55);
+  }
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+  }
+  .footer__legal a:hover,
+  .footer__legal button:hover {
+    color: var(--paper);
+  }
+  @media (min-width: 900px) {
+    .footer__top {
+      grid-template-columns: 1fr auto;
+      align-items: end;
+    }
+    .footer__grid {
+      grid-template-columns: 1.4fr 1fr 0.8fr 1fr;
+    }
+    .footer__brand {
+      grid-column: auto;
+    }
+  }
+</style>

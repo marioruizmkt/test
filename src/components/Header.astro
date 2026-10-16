@@ -1,0 +1,473 @@
+---
+import { Image } from 'astro:assets';
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import Button from './Button.astro';
+import { topServices, childrenOf, serviceHref } from '@/data/services';
+import { site } from '@/data/site';
+
+const path = Astro.url.pathname;
+const isActive = (href: string) => (href === '/' ? path === '/' : path.startsWith(href));
+---
+
+<header class="header" data-header>
+  <div class="header__bar container">
+    <a href="/" class="header__logo" aria-label="Globalízame, ir a inicio">
+      <Logo variant="light" class="logo-l" />
+      <Logo variant="dark" class="logo-d" />
+    </a>
+
+    <nav class="nav" aria-label="Principal">
+      <ul role="list" class="nav__list">
+        <li class="nav__item nav__item--mega" data-mega>
+          <a href="/servicios/" class:list={['nav__link', { 'is-active': isActive('/servicios/') }]} aria-haspopup="true" aria-expanded="false" data-mega-trigger>
+            Servicios <Icon name="chevron-down" size={16} />
+          </a>
+          <div class="mega" data-mega-panel>
+            <div class="mega__inner">
+              <div class="mega__intro">
+                <p class="eyebrow">Servicios</p>
+                <p class="mega__title">Piezas que funcionan <em>como un sistema</em>.</p>
+                <a href="/servicios/" class="mega__all link">Ver todos los servicios</a>
+              </div>
+              <ul role="list" class="mega__grid">
+                {topServices.map((s) => (
+                  <li>
+                    <a href={serviceHref(s)} class="mega__card">
+                      <Image src={s.image} alt="" width={96} height={96} class="mega__img" loading="lazy" />
+                      <span>
+                        <span class="mega__name">{s.navLabel}</span>
+                        <span class="mega__desc">{s.card.title}</span>
+                      </span>
+                    </a>
+                    {childrenOf(s.slug).map((c) => (
+                      <a href={serviceHref(c)} class="mega__child">
+                        <Icon name="arrow" size={14} /> {c.navLabel}
+                      </a>
+                    ))}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </li>
+        <li class="nav__item"><a href="/sobre/" class:list={['nav__link', { 'is-active': isActive('/sobre/') }]}>Sobre nosotros</a></li>
+        <li class="nav__item"><a href="/contacto/" class:list={['nav__link', { 'is-active': isActive('/contacto/') }]}>Contacto</a></li>
+      </ul>
+    </nav>
+
+    <div class="header__cta">
+      <Button href="/contacto/" variant="green" size="sm">Hablemos</Button>
+    </div>
+
+    <button class="header__burger" type="button" aria-expanded="false" aria-controls="mobile-menu" data-menu-toggle>
+      <span class="visually-hidden">Abrir menú</span>
+      <span class="burger" aria-hidden="true"><span></span><span></span></span>
+    </button>
+  </div>
+
+  <div class="mobile on-dark" id="mobile-menu" data-mobile-menu hidden>
+    <div class="mobile__inner container">
+      <nav aria-label="Menú móvil">
+        <p class="eyebrow">Servicios</p>
+        <ul role="list" class="mobile__services">
+          {topServices.map((s) => (
+            <li>
+              <a href={serviceHref(s)}>{s.name}</a>
+              {childrenOf(s.slug).map((c) => (
+                <a href={serviceHref(c)} class="mobile__child">— {c.name}</a>
+              ))}
+            </li>
+          ))}
+        </ul>
+        <ul role="list" class="mobile__main">
+          <li><a href="/servicios/">Todos los servicios</a></li>
+          <li><a href="/sobre/">Sobre nosotros</a></li>
+          <li><a href="/contacto/">Contacto</a></li>
+        </ul>
+      </nav>
+      <div class="mobile__foot">
+        <Button href="/contacto/" variant="green">Cuéntanos tu caso</Button>
+        <a href={`mailto:${site.email}`} class="mobile__mail">{site.email}</a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<script>
+  const header = document.querySelector<HTMLElement>('[data-header]')!;
+  const toggle = header.querySelector<HTMLButtonElement>('[data-menu-toggle]')!;
+  const menu = header.querySelector<HTMLElement>('[data-mobile-menu]')!;
+
+  // Cabecera compacta al hacer scroll
+  const onScroll = () => header.classList.toggle('is-scrolled', window.scrollY > 12);
+  onScroll();
+  window.addEventListener('scroll', onScroll, { passive: true });
+
+  // Menú móvil
+  const setMenu = (open: boolean) => {
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.querySelector('.visually-hidden')!.textContent = open ? 'Cerrar menú' : 'Abrir menú';
+    header.classList.toggle('menu-open', open);
+    document.documentElement.classList.toggle('no-scroll', open);
+    if (open) {
+      menu.hidden = false;
+      requestAnimationFrame(() => menu.classList.add('is-open'));
+    } else {
+      menu.classList.remove('is-open');
+      setTimeout(() => (menu.hidden = !menu.classList.contains('is-open') ? true : false), 400);
+    }
+  };
+  toggle.addEventListener('click', () => setMenu(toggle.getAttribute('aria-expanded') !== 'true'));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && toggle.getAttribute('aria-expanded') === 'true') {
+      setMenu(false);
+      toggle.focus();
+    }
+  });
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => e.matches && setMenu(false));
+
+  // Megamenú: accesible con teclado y táctil
+  const mega = header.querySelector<HTMLElement>('[data-mega]')!;
+  const trigger = mega.querySelector<HTMLAnchorElement>('[data-mega-trigger]')!;
+  let closeTimer: number | undefined;
+  const setMega = (open: boolean) => {
+    window.clearTimeout(closeTimer);
+    mega.classList.toggle('is-open', open);
+    trigger.setAttribute('aria-expanded', String(open));
+  };
+  mega.addEventListener('pointerenter', (e) => e.pointerType === 'mouse' && setMega(true));
+  mega.addEventListener('pointerleave', (e) => {
+    if (e.pointerType === 'mouse') closeTimer = window.setTimeout(() => setMega(false), 160);
+  });
+  mega.addEventListener('focusin', () => setMega(true));
+  mega.addEventListener('focusout', (e) => {
+    if (!mega.contains(e.relatedTarget as Node)) setMega(false);
+  });
+  mega.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      setMega(false);
+      trigger.focus();
+    }
+  });
+</script>
+
+<style>
+  .header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    transition: background-color 0.4s, box-shadow 0.4s;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgb(242 239 233 / 0.78);
+    backdrop-filter: blur(16px) saturate(1.4);
+    -webkit-backdrop-filter: blur(16px) saturate(1.4);
+    opacity: 0;
+    transition: opacity 0.4s;
+    box-shadow: 0 1px 0 var(--line);
+  }
+  .header.is-scrolled::before {
+    opacity: 1;
+  }
+  .header__bar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    height: 5.25rem;
+    transition: height 0.4s var(--ease);
+  }
+  .header.is-scrolled .header__bar {
+    height: 4.25rem;
+  }
+  .header__logo {
+    width: 9.25rem;
+    flex-shrink: 0;
+    margin-top: -0.35rem;
+    position: relative;
+    z-index: 2;
+  }
+  .nav {
+    display: none;
+    margin-left: auto;
+  }
+  .nav__list {
+    display: flex;
+    gap: 0.25rem;
+  }
+  .nav__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.6rem 0.95rem;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
+    font-size: 0.96875rem;
+    transition: background-color 0.25s;
+  }
+  .nav__link:hover,
+  .nav__item--mega.is-open .nav__link {
+    background: rgb(20 23 20 / 0.06);
+  }
+  .nav__link.is-active {
+    box-shadow: inset 0 -2px 0 -0.0rem transparent;
+    position: relative;
+  }
+  .nav__link.is-active::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0.15rem;
+    width: 5px;
+    height: 5px;
+    margin-left: -2.5px;
+    border-radius: 50%;
+    background: var(--green);
+  }
+  .nav__link :global(svg) {
+    transition: transform 0.3s var(--ease);
+  }
+  .nav__item--mega.is-open .nav__link :global(svg) {
+    transform: rotate(180deg);
+  }
+  .header__cta {
+    display: none;
+  }
+  .header__burger {
+    margin-left: auto;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--ink);
+    color: var(--paper);
+    position: relative;
+    z-index: 2;
+    transition: background-color 0.3s;
+  }
+  .burger {
+    position: relative;
+    width: 18px;
+    height: 10px;
+  }
+  .burger span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.75px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.45s var(--ease), top 0.45s var(--ease);
+  }
+  .burger span:first-child {
+    top: 0;
+  }
+  .burger span:last-child {
+    top: 8px;
+  }
+  .menu-open .header__burger {
+    background: var(--green);
+    color: var(--ink);
+  }
+  .menu-open .burger span:first-child {
+    top: 4px;
+    transform: rotate(45deg);
+  }
+  .menu-open .burger span:last-child {
+    top: 4px;
+    transform: rotate(-45deg);
+  }
+  .header__logo :global(.logo-d),
+  .menu-open .header__logo :global(.logo-l) {
+    display: none;
+  }
+  .menu-open .header__logo :global(.logo-d) {
+    display: inline-block;
+    width: 100%;
+  }
+
+  /* Megamenú */
+  .nav__item--mega {
+    position: static;
+  }
+  .mega {
+    position: absolute;
+    left: var(--gutter);
+    right: var(--gutter);
+    top: calc(100% - 0.25rem);
+    padding-top: 0.5rem;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity 0.3s var(--ease), transform 0.4s var(--ease), visibility 0.3s;
+  }
+  .nav__item--mega.is-open .mega {
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+  }
+  .mega__inner {
+    display: grid;
+    grid-template-columns: 17rem 1fr;
+    gap: 2rem;
+    padding: 2rem;
+    background: var(--white);
+    border-radius: var(--radius-lg);
+    box-shadow:
+      0 1px 0 var(--line),
+      0 30px 80px -20px rgb(20 23 20 / 0.28);
+  }
+  .mega__intro {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: var(--paper);
+    border-radius: var(--radius);
+  }
+  .mega__title {
+    font-size: 1.75rem;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    font-weight: 560;
+  }
+  .mega__all {
+    margin-top: auto;
+    font-weight: 550;
+    font-size: 0.9375rem;
+    align-self: flex-start;
+  }
+  .mega__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.25rem 1rem;
+  }
+  .mega__card {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.6rem;
+    border-radius: 16px;
+    transition: background-color 0.2s;
+  }
+  .mega__card:hover {
+    background: var(--paper);
+  }
+  .mega__img {
+    width: 3.5rem;
+    height: 3.5rem;
+    object-fit: contain;
+    flex-shrink: 0;
+    transition: transform 0.5s var(--ease-spring);
+  }
+  .mega__card:hover .mega__img {
+    transform: scale(1.1) rotate(-4deg);
+  }
+  .mega__name {
+    display: block;
+    font-weight: 600;
+    font-size: 0.96875rem;
+    letter-spacing: -0.01em;
+  }
+  .mega__desc {
+    display: block;
+    color: var(--muted);
+    font-size: 0.8125rem;
+    line-height: 1.35;
+  }
+  .mega__child {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin: -0.2rem 0 0.4rem 5rem;
+    font-size: 0.8125rem;
+    font-weight: 550;
+    color: var(--green-ink);
+  }
+  .mega__child:hover {
+    color: var(--ink);
+  }
+
+  /* Menú móvil */
+  .mobile {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    background: var(--ink);
+    color: var(--paper);
+    overflow-y: auto;
+    clip-path: circle(0% at calc(100% - var(--gutter) - 1.5rem) 2.6rem);
+    transition: clip-path 0.6s var(--ease);
+  }
+  .mobile.is-open {
+    clip-path: circle(150% at calc(100% - var(--gutter) - 1.5rem) 2.6rem);
+  }
+  .mobile__inner {
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+    padding-top: 7rem;
+    padding-bottom: 2.5rem;
+  }
+  .mobile__services {
+    margin-top: 1rem;
+    display: grid;
+    gap: 0.15rem;
+  }
+  .mobile__services a {
+    display: block;
+    font-size: clamp(1.6rem, 6vw, 2.25rem);
+    font-weight: 540;
+    letter-spacing: -0.035em;
+    line-height: 1.25;
+  }
+  .mobile__services a.mobile__child {
+    font-size: 1.125rem;
+    color: var(--green);
+    padding-left: 0.25rem;
+    letter-spacing: -0.01em;
+  }
+  .mobile__main {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgb(242 239 233 / 0.15);
+    display: grid;
+    gap: 0.5rem;
+    font-size: 1.125rem;
+    color: rgb(242 239 233 / 0.75);
+  }
+  .mobile__foot {
+    margin-top: auto;
+    display: grid;
+    gap: 1rem;
+    justify-items: start;
+  }
+  .mobile__mail {
+    color: rgb(242 239 233 / 0.7);
+  }
+
+  @media (min-width: 1024px) {
+    .nav,
+    .header__cta {
+      display: block;
+    }
+    .header__burger,
+    .mobile {
+      display: none;
+    }
+    .header__logo {
+      width: 10.25rem;
+    }
+  }
+  @media (min-width: 1024px) and (max-width: 1180px) {
+    .mega__grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
